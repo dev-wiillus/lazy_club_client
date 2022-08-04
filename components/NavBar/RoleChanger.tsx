@@ -54,7 +54,7 @@ export default function RoleChanger() {
             <span className="font-semibold text-secondary">
               {anotherRoleText}
             </span>
-            로 변경하시겠습니가?
+            로 변경하시겠습니까?
           </p>
           <div className="modal-action">
             <label htmlFor="confirm-role-change" className="btn">
