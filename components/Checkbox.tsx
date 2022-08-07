@@ -1,10 +1,8 @@
 import React, { useState } from "react";
+import { ControllerRenderProps } from "react-hook-form";
 
 type CheckboxProps = {
-  inputProps: React.DetailedHTMLProps<
-    React.InputHTMLAttributes<HTMLInputElement>,
-    HTMLInputElement
-  >;
+  inputProps: any;
   labelText?: string;
   defaultChecked?: boolean;
   extra?: React.ReactElement;
