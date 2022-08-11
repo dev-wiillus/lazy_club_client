@@ -1,10 +1,14 @@
-import { NextRouter, useRouter } from "next/router";
-import { useMemo } from "react";
+import { useCallback } from "react";
+import { roleModeVar } from "../../apollo";
+import { LOCALSTORAGE_ROLE_MODE } from "../constants";
 
-export default function useRole(): [string, NextRouter, boolean] {
-  const router = useRouter();
-  const role = useMemo(() => router.pathname.split("/")[1], [router.pathname]);
+export default function useRole(): [string, (value: 'user' | 'creator') => void] {
+  const role = roleModeVar() ?? 'user'
 
-  const notRole = useMemo(() => !["user", "creator"].includes(role), [role]);
-  return [role, router, notRole];
+  const setRole = useCallback((value: 'user' | 'creator') => {
+    localStorage.setItem(LOCALSTORAGE_ROLE_MODE, value);
+    roleModeVar(value)
+  }, []);
+
+  return [role, setRole];
 }

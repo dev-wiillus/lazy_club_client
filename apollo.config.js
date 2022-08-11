@@ -1,6 +1,6 @@
 module.exports = {
 	client: {
-		includes: ['./pages/**/*.tsx'],
+		includes: ['pages/**/*.tsx', 'services/**/*.tsx', 'utils/**/*.ts'],
 		tagName: 'gql',
 		service: {
 			name: 'lazy-club-backend',

@@ -1,23 +1,20 @@
-import type { NextPage } from 'next';
-import { useCallback } from 'react';
-import { isLoggedInVar } from '../../apollo';
-import Logo from '../../components/NavBar/Logo';
-import { Controller, useForm } from 'react-hook-form';
-import { FormError } from '../../components/FormError';
-import { gql, useMutation } from '@apollo/client';
+import { gql, useApolloClient, useMutation } from '@apollo/client';
+import { NextPage } from 'next';
+import React, { useCallback } from 'react';
+import { useForm } from 'react-hook-form';
 import { Button } from '../../components/Button';
-import Link from 'next/link';
+import { FormError } from '../../components/FormError';
 import Seo from '../../components/Seo';
-import {
-	RegisterMutation,
-	RegisterMutationVariables,
-} from '../../__generated__/RegisterMutation';
+import useMe from '../../utils/hooks/useMe';
 import { emailPattern } from '../../utils/patterns';
-import { useRouter } from 'next/router';
+import {
+	EditProfile,
+	EditProfileVariables,
+} from '../../__generated__/EditProfile';
 
-const REGISTER_MUTATION = gql`
-	mutation RegisterMutation($input: RegisterInput!) {
-		register(input: $input) {
+const EDIT_PROFILE_MUTATION = gql`
+	mutation EditProfile($input: EditProfileInput!) {
+		editProfile(input: $input) {
 			ok
 			error
 		}
@@ -25,52 +22,80 @@ const REGISTER_MUTATION = gql`
 `;
 
 interface IForm {
-	name: string;
-	phone: string;
-	email: string;
-	password: string;
-	nickname: string;
+	name?: string;
+	phone?: string;
+	email?: string;
+	password?: string;
+	nickname?: string;
 }
 
-const SignUp: NextPage = () => {
+const EditProfile: NextPage = () => {
+	const { data: userData } = useMe();
+	const client = useApolloClient();
+	const onCompleted = useCallback(
+		(data: EditProfile) => {
+			const {
+				editProfile: { ok },
+			} = data;
+			if (ok && userData) {
+				const {
+					me: { email: prevEmail, id },
+				} = userData;
+				const { email: newEmail } = getValues();
+				if (prevEmail !== newEmail) {
+					// TODO: 나머지 필드들도 반영되도록
+					client.writeFragment({
+						id: `UserOutput:${id}`,
+						fragment: gql`
+							fragment EditedUser on UserOutput {
+								verified
+								email
+							}
+						`,
+						data: {
+							verified: false,
+							email: newEmail,
+						},
+					});
+				}
+			}
+		},
+		[userData, client],
+	);
+	const [editProfile, { loading }] = useMutation<
+		EditProfile,
+		EditProfileVariables
+	>(EDIT_PROFILE_MUTATION, {
+		onCompleted,
+	});
 	const { register, getValues, getFieldState, handleSubmit, formState } =
-		useForm<IForm>({ mode: 'onBlur' });
-	const router = useRouter();
-	const onCompleted = useCallback((data: RegisterMutation) => {
-		const { ok } = data.register;
-		if (ok) {
-			router.push('/sign-in');
-		}
-	}, []);
-	const [regitserMutation, { data: registerMutationResult, loading }] =
-		useMutation<RegisterMutation, RegisterMutationVariables>(REGISTER_MUTATION);
+		useForm<IForm>({
+			mode: 'onChange',
+			defaultValues: {
+				...userData?.me,
+				name: userData?.me.name,
+			},
+		});
+
 	const onSubmit = useCallback(() => {
-		if (!loading) {
-			const { email, password, name, nickname, phone } = getValues();
-			regitserMutation({
-				variables: {
-					input: {
-						email,
-						password,
-						name,
-						nickname,
-						phone,
-					},
+		const { password, email, name, nickname, phone } = getValues();
+		editProfile({
+			variables: {
+				input: {
+					email,
+					name,
+					nickname,
+					phone,
+					...(password !== '' && { password }),
 				},
-				onCompleted,
-			});
-		}
-	}, []);
+			},
+		});
+	}, [getValues]);
 	return (
 		<>
-			<Seo title="Sign Up" />
+			<Seo title="Edit Profile" />
 			<div className="hero min-h-screen">
 				<div className="hero-content flex-col">
-					<div className="text-center">
-						<h2 className="text-xl">성공하는 사람들의 성장 습관</h2>
-						<Logo />
-						<h3 className="text-2xl font-bold">회원가입</h3>
-					</div>
 					<form className="form space-y-4" onSubmit={handleSubmit(onSubmit)}>
 						<input
 							className="input input-bordered w-full"
@@ -109,7 +134,6 @@ const SignUp: NextPage = () => {
 							type="password"
 							className="input input-bordered w-full"
 							placeholder="비밀번호"
-							required
 							{...register('password')}
 						/>
 						{getFieldState('password').error && (
@@ -131,24 +155,16 @@ const SignUp: NextPage = () => {
 						<Button
 							canClick={formState.isValid}
 							loading={loading}
-							actionText="회원가입"
+							actionText="수정"
 						/>
-						{registerMutationResult?.register.error && (
+						{/* {registerMutationResult?.register.error && (
 							<FormError errorMessage={registerMutationResult.register.error} />
-						)}
+						)} */}
 					</form>
-					<div>
-						Already joined to Lazy Club?{' '}
-						<Link href="/sign-in">
-							<span className="text-sky-500 cursor-pointer hover:underline">
-								로그인
-							</span>
-						</Link>
-					</div>
 				</div>
 			</div>
 		</>
 	);
 };
 
-export default SignUp;
+export default EditProfile;
