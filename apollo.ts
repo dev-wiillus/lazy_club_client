@@ -1,5 +1,6 @@
-import { ApolloClient, createHttpLink, gql, InMemoryCache, makeVar } from '@apollo/client'
+import { ApolloClient, InMemoryCache, makeVar } from '@apollo/client'
 import { setContext } from '@apollo/client/link/context';
+import { createUploadLink } from "apollo-upload-client";
 import { LOCALSTORAGE_ROLE_MODE, LOCALSTORAGE_TOKEN } from './utils/constants';
 
 const token = typeof window !== 'undefined' ? localStorage.getItem(LOCALSTORAGE_TOKEN) : null
@@ -8,8 +9,9 @@ const roleMode = typeof window !== 'undefined' && typeof localStorage !== 'undef
 export const isLoggedInVar = makeVar(Boolean(token));
 export const authToken = makeVar(token);
 export const roleModeVar = makeVar(roleMode)
+export const channelVar = makeVar<number | undefined>(undefined)
 
-const httpLink = createHttpLink({
+const httpLink = createUploadLink({
   uri: 'http://localhost:4000/graphql'
 })
 
@@ -40,7 +42,11 @@ export const client = new ApolloClient({
           roleMode: {
             read() {
               return roleModeVar()
-              // return typeof window !== 'undefined' && typeof localStorage !== 'undefined' ? localStorage.getItem(LOCALSTORAGE_ROLE_MODE) : null;
+            }
+          },
+          channel: {
+            read() {
+              return channelVar()
             }
           }
         }

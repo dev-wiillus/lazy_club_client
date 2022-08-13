@@ -2,7 +2,11 @@
 @tailwind components;
 
 .label {
-  @apply font-bold
+	@apply font-bold;
+}
+
+.ql-container {
+	min-height: 30rem;
 }
 
 @tailwind utilities;
