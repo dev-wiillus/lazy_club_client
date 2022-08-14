@@ -9,7 +9,6 @@ const roleMode = typeof window !== 'undefined' && typeof localStorage !== 'undef
 export const isLoggedInVar = makeVar(Boolean(token));
 export const authToken = makeVar(token);
 export const roleModeVar = makeVar(roleMode)
-export const channelVar = makeVar<number | undefined>(undefined)
 
 const httpLink = createUploadLink({
   uri: 'http://localhost:4000/graphql'
@@ -44,11 +43,6 @@ export const client = new ApolloClient({
               return roleModeVar()
             }
           },
-          channel: {
-            read() {
-              return channelVar()
-            }
-          }
         }
       }
     }

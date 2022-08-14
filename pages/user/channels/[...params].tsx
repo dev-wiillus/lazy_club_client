@@ -39,7 +39,7 @@ const ChannelDetail: NextPage<DetailProps> = ({ params, movie, movieList }) => {
   const router = useRouter();
   const onClick = (id: string, title: string) => {
     // TODO: session이 없을 경우 signIn 연결되는 hook이나 함수 만들기
-    signIn("kakao");
+    // signIn("kakao");
     // router.push(`${router.pathname}/${title}/${id}`);
   };
   return (

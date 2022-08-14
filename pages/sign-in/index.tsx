@@ -1,7 +1,7 @@
 import type { NextPage } from 'next';
 import { useCallback } from 'react';
 import { authToken, isLoggedInVar } from '../../apollo';
-import Logo from '../../components/NavBar/Logo';
+import Logo from '../../components/Logo';
 import { useForm } from 'react-hook-form';
 import { FormError } from '../../components/FormError';
 import { gql, useMutation } from '@apollo/client';
@@ -117,7 +117,7 @@ const SignIn: NextPage = () => {
 							</span>
 						</Link>
 					</div>
-					<div className="card flex-shrink-0 w-full shadow-2xl bg-base-100">
+					{/* <div className="card flex-shrink-0 w-full shadow-2xl bg-base-100">
 						<div className="card-body">
 							<h4>카카오 계정으로 로그인</h4>
 							<a
@@ -135,7 +135,7 @@ const SignIn: NextPage = () => {
 							<h4>네이버 계정으로 로그인</h4>
 							<h4>Google 계정으로 로그인</h4>
 						</div>
-					</div>
+					</div> */}
 				</div>
 			</div>
 		</>

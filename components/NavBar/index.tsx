@@ -1,5 +1,5 @@
 import React from 'react';
-import Logo from './Logo';
+import Logo from '../Logo';
 import Menu from './Menu';
 import Link from 'next/link';
 import useMe from '../../utils/hooks/useMe';

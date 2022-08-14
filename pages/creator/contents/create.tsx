@@ -1,8 +1,7 @@
-import { gql, useMutation, useQuery } from '@apollo/client';
+import { useMutation } from '@apollo/client';
 import { NextPage } from 'next';
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useForm } from 'react-hook-form';
-// import Editor from '../../../components/QuillEditor';
 import {
 	CreateContent,
 	CreateContentVariables,
@@ -17,29 +16,14 @@ import {
 } from '../../../__generated__/globalTypes';
 import dynamic from 'next/dynamic';
 import useMe from '../../../utils/hooks/useMe';
-import { channelVar } from '../../../apollo';
 import { useRouter } from 'next/router';
 import ImageUpload from '../../../components/ImageUpload';
+import { CREATE_CONTENT_MUTATION } from '../../../services/channel/gql';
 
 const DynamicComponent = dynamic(
 	() => import('../../../components/QuillEditor'),
 	{ ssr: false },
 );
-
-const CREATE_CONTENT_MUTATION = gql`
-	mutation CreateContent($input: CreateContentInput!) {
-		createContent(input: $input) {
-			ok
-			error
-			results {
-				id
-				title
-				content
-				status
-			}
-		}
-	}
-`;
 
 type IForm = Pick<CreateContentInput, 'title' | 'content'> & {
 	previewImage?: string;

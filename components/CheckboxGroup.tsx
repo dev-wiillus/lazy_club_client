@@ -32,8 +32,8 @@ export default function CheckboxGroup({
 								value={item.value}
 								checked={item.value === value}
 								onClick={(event) => {
-									console.log(event.target.value);
-									setValue(event.target.value);
+									// console.log(event.target.value);
+									// setValue(event.target.value);
 								}}
 							/>
 						</label>

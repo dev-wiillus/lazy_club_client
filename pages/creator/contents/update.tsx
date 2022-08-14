@@ -11,7 +11,10 @@ import {
 	FindContent,
 	FindContentVariables,
 } from '../../../__generated__/FindContent';
-import { EditContentInput, EditContentInput } from '../../../__generated__/globalTypes';
+import {
+	EditContentInput,
+	EditContentInput,
+} from '../../../__generated__/globalTypes';
 import dynamic from 'next/dynamic';
 import useMe from '../../../utils/hooks/useMe';
 import { channelVar } from '../../../apollo';

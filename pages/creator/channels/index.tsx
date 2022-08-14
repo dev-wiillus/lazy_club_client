@@ -4,60 +4,15 @@ import Image from 'next/image';
 import Link from 'next/link';
 import { useRouter } from 'next/router';
 import { useEffect } from 'react';
-import { channelVar } from '../../../apollo';
 import Seo from '../../../components/Seo';
-import Inform from '../../../services/channel/inform';
-import ListUp from '../../../services/channel/list-up';
 import useMe from '../../../utils/hooks/useMe';
 import useRole from '../../../utils/hooks/useRole';
-import { imageLoader } from '../../../utils/imageLoader';
 import {
 	FindChannel,
 	FindChannelVariables,
 } from '../../../__generated__/FindChannel';
 import lazyClubLogo from '../../../public/LAZYBLUB_blk.png';
-
-const FIND_CHANNEL_QUERY = gql`
-	query FindChannel($input: FindChannelInput!) {
-		findChannel(input: $input) {
-			ok
-			error
-			results {
-				id
-				title
-				description
-				thumbnail
-				operators {
-					user {
-						name
-						nickname
-					}
-				}
-				categories {
-					tag {
-						id
-						name
-					}
-				}
-				contents {
-					id
-					title
-					category
-					hit
-					contentFiles {
-						file
-						isPreview
-					}
-				}
-				agentNickname
-				agentProfile
-				agentIntroduction
-				termsOfService
-				agreements
-			}
-		}
-	}
-`;
+import { FIND_CHANNEL_QUERY } from '../../../services/channel/gql';
 
 const Channels: NextPage = () => {
 	const [role] = useRole();

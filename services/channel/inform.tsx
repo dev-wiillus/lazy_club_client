@@ -2,7 +2,7 @@ export default function Inform() {
 	return (
 		<div className="hero h-auto bg-base-200 py-8">
 			<div className="hero-content text-center">
-				<div className="max-w-md space-y-4">
+				<div className="max-w-md space-y-8">
 					<h2 className="text-3xl font-bold">
 						Clubber들의 채널들이 곧 오픈돼요!
 					</h2>

@@ -6,28 +6,7 @@ import {
 	FindAllChannelVariables,
 } from '../../__generated__/FindAllChannel';
 import { gql, useQuery } from '@apollo/client';
-
-const FIND_ALL_CHANNEL_QUERY = gql`
-	query FindAllChannel($input: FindAllChannelInput!) {
-		findAllChannel(input: $input) {
-			ok
-			error
-			totalPages
-			totalResults
-			results {
-				id
-				title
-				thumbnail
-				operators {
-					user {
-						name
-						nickname
-					}
-				}
-			}
-		}
-	}
-`;
+import { FIND_ALL_CHANNEL_QUERY } from './gql';
 
 export default function ListUp() {
 	const router = useRouter();
@@ -49,25 +28,29 @@ export default function ListUp() {
 	const { results } = data?.findAllChannel ?? {};
 	return (
 		<>
-			{results?.map((movie) => (
+			{results?.map(({ id, title, thumbnail, operators }) => (
 				<div
 					// onClick={() => onClick(movie.id, movie.original_title)}
 					className="card card-side cursor-pointer shadow-xl"
-					key={movie.id}
+					key={id}
 				>
 					<Image
 						loader={imageLoader}
-						src={`/t/p/w500${movie}`}
+						src={`${thumbnail}`}
 						alt="channel-image"
 						width={200}
 						height={200}
 					/>
 					<div className="card-body flex-row">
 						<div className="flex flex-col flex-1">
-							{/* <h4 className="card-title">{movie.original_title}</h4> */}
+							<h3 className="card-title">{title}</h3>
 							<p>채널 설명 요약</p>
 							<p>채널 카테고리</p>
-							<p>채널 운영자들</p>
+							<p>
+								{operators?.map((operator) =>
+									operator.user.nickname.split(','),
+								)}
+							</p>
 						</div>
 						<div className="card-actions items-center">
 							<svg

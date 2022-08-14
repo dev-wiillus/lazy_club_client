@@ -5,6 +5,7 @@ import { useCallback } from 'react';
 import { Controller, useForm } from 'react-hook-form';
 import Checkbox from '../../../components/Checkbox';
 import ImageUpload from '../../../components/ImageUpload';
+import { FIND_ALL_TAG_OPTIONS } from '../../../services/channel/gql';
 import useMe from '../../../utils/hooks/useMe';
 import useRole from '../../../utils/hooks/useRole';
 import {
@@ -50,19 +51,6 @@ const CREATE_CHANNEL_MUTATION = gql`
 				agentIntroduction
 				termsOfService
 				agreements
-			}
-		}
-	}
-`;
-
-const FIND_ALL_TAG_OPTIONS = gql`
-	query FindAllTagOptions {
-		findAllTagOptions {
-			ok
-			error
-			results {
-				value
-				label
 			}
 		}
 	}
@@ -291,15 +279,71 @@ const MutateChannel: NextPage = () => {
 							<Checkbox
 								inputProps={register('termsOfService')}
 								labelText="(필수) 이용 약관에 동의합니다."
-								extra={<button className="btn btn-ghost">모두 보기</button>}
+								extra={
+									<label
+										htmlFor="termsOfService-modal"
+										className="btn btn-ghost btn-modal"
+									>
+										모두 보기
+									</label>
+								}
 							/>
+							<input
+								type="checkbox"
+								id="termsOfService-modal"
+								className="modal-toggle"
+							/>
+							<div className="modal">
+								<div className="modal-box">
+									<h3 className="font-bold text-lg">
+										Congratulations random Internet user!
+									</h3>
+									<p className="py-4">
+										You've been selected for a chance to get one year of
+										subscription to use Wikipedia for free!
+									</p>
+									<div className="modal-action">
+										<label htmlFor="termsOfService-modal" className="btn">
+											Yay!
+										</label>
+									</div>
+								</div>
+							</div>
 						</div>
 						<div className="form-control">
 							<Checkbox
 								inputProps={register('agreements')}
 								labelText="(필수) 개인정보처리방침에 동의합니다."
-								extra={<button className="btn btn-ghost">모두 보기</button>}
+								extra={
+									<label
+										htmlFor="agreements-modal"
+										className="btn btn-ghost btn-modal"
+									>
+										모두 보기
+									</label>
+								}
 							/>
+							<input
+								type="checkbox"
+								id="agreements-modal"
+								className="modal-toggle"
+							/>
+							<div className="modal">
+								<div className="modal-box">
+									<h3 className="font-bold text-lg">
+										Congratulations random Internet user!
+									</h3>
+									<p className="py-4">
+										You've been selected for a chance to get one year of
+										subscription to use Wikipedia for free!
+									</p>
+									<div className="modal-action">
+										<label htmlFor="agreements-modal" className="btn">
+											Yay!
+										</label>
+									</div>
+								</div>
+							</div>
 						</div>
 					</div>
 				</div>
