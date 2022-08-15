@@ -5,13 +5,13 @@ import {
 	FindAllChannel,
 	FindAllChannelVariables,
 } from '../../__generated__/FindAllChannel';
-import { gql, useQuery } from '@apollo/client';
+import { useQuery } from '@apollo/client';
 import { FIND_ALL_CHANNEL_QUERY } from './gql';
 
 export default function ListUp() {
 	const router = useRouter();
-	const onClick = (id: string, title: string) => {
-		router.push(`${router.pathname}/${title}/${id}`);
+	const onClick = (id: number, title: string) => {
+		router.push(`${router.pathname}/channels/${title}/${id}`);
 	};
 
 	const { data, loading } = useQuery<FindAllChannel, FindAllChannelVariables>(
@@ -22,6 +22,7 @@ export default function ListUp() {
 					page: 1,
 				},
 			},
+			ssr: true,
 		},
 	);
 
@@ -30,17 +31,23 @@ export default function ListUp() {
 		<>
 			{results?.map(({ id, title, thumbnail, operators }) => (
 				<div
-					// onClick={() => onClick(movie.id, movie.original_title)}
+					onClick={() => onClick(id, title)}
 					className="card card-side cursor-pointer shadow-xl"
 					key={id}
 				>
-					<Image
+					{/* <Image
 						loader={imageLoader}
 						src={`${thumbnail}`}
 						alt="channel-image"
 						width={200}
 						height={200}
-					/>
+					/> */}
+					<figure>
+						<img
+							src="https://placeimg.com/200/200/arch"
+							alt="content-main-img"
+						/>
+					</figure>
 					<div className="card-body flex-row">
 						<div className="flex flex-col flex-1">
 							<h3 className="card-title">{title}</h3>

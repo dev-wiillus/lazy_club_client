@@ -1,6 +1,7 @@
 import { useRouter } from 'next/router';
 import React, { useCallback, useMemo } from 'react';
 import useRole from '../../utils/hooks/useRole';
+import { UserRoleType } from '../../__generated__/globalTypes';
 
 type InputProps = {
 	className?: string;
@@ -11,7 +12,7 @@ export default function RoleChanger({ className }: InputProps) {
 	const [role, setRole] = useRole();
 
 	const onRoleChange = useCallback(() => {
-		const newRole = role === 'creator' ? 'user' : 'creator';
+		const newRole = role === UserRoleType.Creator ? UserRoleType.User : UserRoleType.Creator;
 		setRole(newRole);
 		router.replace('/');
 	}, [role, setRole]);
@@ -19,7 +20,7 @@ export default function RoleChanger({ className }: InputProps) {
 	const [roleText, anotherRoleText] = useMemo(() => {
 		const user = '유저';
 		const clubber = '클러버';
-		return role === 'creator' ? [user, clubber] : [clubber, user];
+		return role === UserRoleType.Creator ? [user, clubber] : [clubber, user];
 	}, [role]);
 
 	return (

@@ -1,14 +1,15 @@
 import { ApolloClient, InMemoryCache, makeVar } from '@apollo/client'
 import { setContext } from '@apollo/client/link/context';
 import { createUploadLink } from "apollo-upload-client";
-import { LOCALSTORAGE_ROLE_MODE, LOCALSTORAGE_TOKEN } from './utils/constants';
+import { LOCALSTORAGE_TOKEN } from './utils/constants';
+import { UserRoleType } from './__generated__/globalTypes';
 
 const token = typeof window !== 'undefined' ? localStorage.getItem(LOCALSTORAGE_TOKEN) : null
-const roleMode = typeof window !== 'undefined' && typeof localStorage !== 'undefined' ? localStorage.getItem(LOCALSTORAGE_ROLE_MODE) : null
 
 export const isLoggedInVar = makeVar(Boolean(token));
 export const authToken = makeVar(token);
-export const roleModeVar = makeVar(roleMode)
+export const roleModeVar = makeVar<UserRoleType | null>(null)
+export const modaleVar = makeVar<boolean>(false)
 
 const httpLink = createUploadLink({
   uri: 'http://localhost:4000/graphql'

@@ -21,7 +21,9 @@ const Channels: NextPage = () => {
 	const [request, { data, loading }] = useLazyQuery<
 		FindChannel,
 		FindChannelVariables
-	>(FIND_CHANNEL_QUERY);
+	>(FIND_CHANNEL_QUERY, {
+		ssr: true,
+	});
 
 	useEffect(() => {
 		if (userData?.me.id) {

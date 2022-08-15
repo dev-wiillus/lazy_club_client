@@ -5,7 +5,7 @@ export default function Home() {
 	const [page, setPage] = useState(0);
 	return (
 		<div
-			className="hero min-h-screen"
+			className="hero h-full"
 			style={{ backgroundImage: 'url(https://placeimg.com/1000/800/arch)' }}
 		>
 			<div className="hero-overlay bg-opacity-60" />

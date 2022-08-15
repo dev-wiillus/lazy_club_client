@@ -1,11 +1,13 @@
 import { gql, useApolloClient, useMutation, useQuery } from '@apollo/client';
 import { NextPage } from 'next';
 import { useRouter } from 'next/router';
-import { useCallback } from 'react';
-import { Controller, useForm } from 'react-hook-form';
+import { useForm } from 'react-hook-form';
 import Checkbox from '../../../components/Checkbox';
 import ImageUpload from '../../../components/ImageUpload';
-import { FIND_ALL_TAG_OPTIONS } from '../../../services/channel/gql';
+import {
+	CREATE_CHANNEL_MUTATION,
+	FIND_ALL_TAG_OPTIONS,
+} from '../../../services/channel/gql';
 import useMe from '../../../utils/hooks/useMe';
 import useRole from '../../../utils/hooks/useRole';
 import {
@@ -18,45 +20,11 @@ import {
 	InviteChannelOperatorInput,
 } from '../../../__generated__/globalTypes';
 
-const CREATE_CHANNEL_MUTATION = gql`
-	mutation CreateChannel(
-		$channelInput: CreateChannelInput!
-		$channelOperatorInput: InviteChannelOperatorInput!
-	) {
-		createChannel(
-			channelInput: $channelInput
-			channelOperatorInput: $channelOperatorInput
-		) {
-			ok
-			error
-			result {
-				id
-				title
-				description
-				thumbnail
-				operators {
-					user {
-						name
-						nickname
-					}
-				}
-				categories {
-					tag {
-						id
-						name
-					}
-				}
-				agentNickname
-				agentProfile
-				agentIntroduction
-				termsOfService
-				agreements
-			}
-		}
-	}
-`;
-
-type IForm = CreateChannelInput & InviteChannelOperatorInput;
+type IForm = CreateChannelInput &
+	InviteChannelOperatorInput & {
+		userNickname: string;
+		userProfile?: string;
+	};
 
 // TODO: creator만 가능
 // TODO: checkbox, image upload, form list
@@ -94,8 +62,6 @@ const MutateChannel: NextPage = () => {
 								name
 							}
 						}
-						agentNickname
-						agentProfile
 						agentIntroduction
 						termsOfService
 						agreements
@@ -126,8 +92,6 @@ const MutateChannel: NextPage = () => {
 				tagId,
 				thumbnail,
 				emails,
-				agentNickname,
-				agentProfile,
 				agentIntroduction,
 				termsOfService,
 				agreements,
@@ -138,12 +102,10 @@ const MutateChannel: NextPage = () => {
 						title,
 						description,
 						tagId,
-						agentNickname,
 						agentIntroduction,
 						termsOfService,
 						agreements,
 						...(!thumbnail && { thumbnail }),
-						...(!agentProfile && { agentProfile }),
 					},
 					channelOperatorInput: {
 						emails: [userData?.me.email],
@@ -154,7 +116,7 @@ const MutateChannel: NextPage = () => {
 	};
 
 	const { data: tagOptionsData, loading: tagOptionsLoading } =
-		useQuery<FindAllTagOptions>(FIND_ALL_TAG_OPTIONS);
+		useQuery<FindAllTagOptions>(FIND_ALL_TAG_OPTIONS, { ssr: true });
 	return (
 		<div className="py-4">
 			<form className="form space-y-4" onSubmit={handleSubmit(onSubmit)}>
@@ -193,44 +155,6 @@ const MutateChannel: NextPage = () => {
 						)}
 					</select>
 				</div>
-				{/* <CheckboxGroup
-					label="채널 태그"
-					items={[
-						{
-							value: '재테크',
-							label: '재테크',
-						},
-						{
-							value: '창업/부업',
-							label: '창업/부업',
-						},
-						{
-							value: '직무',
-							label: '직무',
-						},
-						{
-							value: '습관형성',
-							label: '습관형성',
-						},
-						{
-							value: '건강',
-							label: '건강',
-						},
-						{
-							value: '어학',
-							label: '어학',
-						},
-						{
-							value: '취미',
-							label: '취미',
-						},
-						{
-							value: '기타',
-							label: '기타',
-						},
-					]}
-					formProps={register('tagId', { required: true })}
-				/> */}
 				<div className="form-control w-full space-y-2">
 					<label className="label" htmlFor="description">
 						<span className="label-text">채널 요약</span>
@@ -242,21 +166,21 @@ const MutateChannel: NextPage = () => {
 					/>
 				</div>
 				<div className="form-control w-full space-y-2">
-					<label className="label" htmlFor="agentNickname">
+					<label className="label" htmlFor="userNickname">
 						<span className="label-text">대표 운영자 닉네임(이름)</span>
 					</label>
 					<input
-						id="agentNickname"
+						id="userNickname"
 						type="text"
 						className="input input-bordered w-full"
-						{...register('agentNickname')}
+						{...register('userNickname')}
 					/>
 				</div>
 				<div className="form-control w-full space-y-2">
-					<label className="label" htmlFor="agentProfile">
+					<label className="label" htmlFor="userProfile">
 						<span className="label-text">대표 운영자 프로필</span>
 					</label>
-					<ImageUpload formProps={register('agentProfile')} />
+					<ImageUpload formProps={register('userProfile')} />
 				</div>
 				<div className="form-control w-full space-y-2">
 					<label className="label" htmlFor="agentIntroduction">

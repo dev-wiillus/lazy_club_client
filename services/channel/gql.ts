@@ -60,8 +60,6 @@ export const FIND_CHANNEL_QUERY = gql`
 						isPreview
 					}
 				}
-				agentNickname
-				agentProfile
 				agentIntroduction
 				termsOfService
 				agreements
@@ -70,16 +68,37 @@ export const FIND_CHANNEL_QUERY = gql`
 	}
 `;
 
-export const CREATE_CONTENT_MUTATION = gql`
-	mutation CreateContent($input: CreateContentInput!) {
-		createContent(input: $input) {
+export const CREATE_CHANNEL_MUTATION = gql`
+	mutation CreateChannel(
+		$channelInput: CreateChannelInput!
+		$channelOperatorInput: InviteChannelOperatorInput!
+	) {
+		createChannel(
+			channelInput: $channelInput
+			channelOperatorInput: $channelOperatorInput
+		) {
 			ok
 			error
-			results {
+			result {
 				id
 				title
-				content
-				status
+				description
+				thumbnail
+				operators {
+					user {
+						name
+						nickname
+					}
+				}
+				categories {
+					tag {
+						id
+						name
+					}
+				}
+				agentIntroduction
+				termsOfService
+				agreements
 			}
 		}
 	}
@@ -94,6 +113,15 @@ export const FIND_ALL_TAG_OPTIONS = gql`
 				value
 				label
 			}
+		}
+	}
+`;
+
+export const OPEN_ALERT_MUTATION = gql`
+	mutation OpenAlert(	$input: OpenAlertInput!) { 
+		openAlert(input: $input	) {
+			ok
+			error
 		}
 	}
 `;

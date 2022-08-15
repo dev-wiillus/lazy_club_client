@@ -2,6 +2,7 @@ import React, { useEffect } from 'react';
 import { useRouter } from 'next/router';
 import Link from 'next/link';
 import useRole from '../../utils/hooks/useRole';
+import { UserRoleType } from '../../__generated__/globalTypes';
 
 export type NavItemType = {
 	href: string;
@@ -15,8 +16,8 @@ function NavItem({ href, text }: NavItemType) {
 			<Link href={href}>
 				<a
 					className={`${
-						router.pathname === href ? 'text-red-500 ' : ''
-					}font-semibold text-sm`}
+						router.pathname === href ? 'text-red-500' : ''
+					} font-semibold text-sm`}
 				>
 					{text}
 				</a>
@@ -29,20 +30,15 @@ export default function Menu() {
 	const [role] = useRole();
 	const navItems: NavItemType[] = [
 		{
-			href: `/${role}`,
+			href: `/${role?.toLowerCase()}`,
 			text: 'Home',
-		},
-		{
-			href: `/${role}/channels`,
-			text: 'Channel',
 		},
 	];
 
-	if (role === 'creator') {
-		console.log('pushed');
+	if (role === UserRoleType.Creator) {
 		navItems.splice(1, 0, {
-			href: `/${role}/lounge`,
-			text: 'Lounge',
+			href: `/creator/channels`,
+			text: 'Channel',
 		});
 	}
 	return (

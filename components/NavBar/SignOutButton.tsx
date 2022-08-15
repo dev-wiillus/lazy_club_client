@@ -1,6 +1,7 @@
+import { useApolloClient } from '@apollo/client';
 import { useRouter } from 'next/router';
 import { useCallback } from 'react';
-import { authToken, isLoggedInVar } from '../../apollo';
+import { authToken } from '../../apollo';
 import { LOCALSTORAGE_TOKEN } from '../../utils/constants';
 
 type InputProps = {
@@ -9,11 +10,13 @@ type InputProps = {
 
 export default function SignOutButton({ className }: InputProps) {
 	const router = useRouter();
+	const client = useApolloClient();
 
 	const onClick = useCallback(() => {
 		localStorage.removeItem(LOCALSTORAGE_TOKEN);
 		authToken(null);
-		isLoggedInVar(false);
+		// TODO: cache clear 제대로 되는지 확인
+		client.clearStore();
 		router.push('/sign-in');
 	}, [router]);
 	return (

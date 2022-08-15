@@ -11,49 +11,19 @@ import {
 	FindContent,
 	FindContentVariables,
 } from '../../../__generated__/FindContent';
-import {
-	EditContentInput,
-	EditContentInput,
-} from '../../../__generated__/globalTypes';
+import { EditContentInput } from '../../../__generated__/globalTypes';
 import dynamic from 'next/dynamic';
 import useMe from '../../../utils/hooks/useMe';
-import { channelVar } from '../../../apollo';
 import { useRouter } from 'next/router';
+import {
+	EDIT_CONTENT_MUTATION,
+	FIND_CONTENT_QUERY,
+} from '../../../services/content/gql';
 
 const DynamicComponent = dynamic(
 	() => import('../../../components/QuillEditor'),
 	{ ssr: false },
 );
-
-const FIND_CONTENT_QUERY = gql`
-	query FindContent($input: FindContentInput!) {
-		findContent(input: $input) {
-			ok
-			error
-			results {
-				id
-				title
-				content
-				status
-			}
-		}
-	}
-`;
-
-const EDIT_CONTENT_MUTATION = gql`
-	mutation EditContent($input: EditContentInput!) {
-		editContent(input: $input) {
-			ok
-			error
-			results {
-				id
-				title
-				content
-				status
-			}
-		}
-	}
-`;
 
 type IForm = Pick<EditContentInput, 'title' | 'content'>;
 
@@ -65,7 +35,7 @@ const MutateContent: NextPage = () => {
 	const { data, loading: queryLoading } = useQuery<
 		FindContent,
 		FindContentVariables
-	>(FIND_CONTENT_QUERY);
+	>(FIND_CONTENT_QUERY, { ssr: true });
 	const onCompleted = () => {
 		// TODO: 캐싱 처리, 알림 띄우기
 	};
@@ -94,15 +64,15 @@ const MutateContent: NextPage = () => {
 		console.log(getValues());
 		if (userData?.me.email && channelId) {
 			const { title, content } = getValues();
-			editContent({
-				variables: {
-					input: {
-						title,
-						content,
-						channelId: +channelId,
-					},
-				},
-			});
+			// editContent({
+			// 	variables: {
+			// 		input: {
+			// 			title,
+			// 			content,
+			// 			channelId: +channelId,
+			// 		},
+			// 	},
+			// });
 		}
 	};
 	return (
@@ -122,10 +92,10 @@ const MutateContent: NextPage = () => {
 							{...register('title', { required: true })}
 						/>
 					</div>
-					<DynamicComponent
+					{/* <DynamicComponent
 						value={editorContent}
 						onChange={onEditorStateChange}
-					/>
+					/> */}
 				</form>
 			</div>
 		</div>

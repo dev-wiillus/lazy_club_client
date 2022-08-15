@@ -1,6 +1,18 @@
 @tailwind base;
 @tailwind components;
 
+.layout {
+	@apply flex flex-col items-center snap-y snap-mandatory overflow-y-auto max-h-screen;
+}
+
+.navbar {
+	@apply fixed max-w-screen-sm px-0 py-6 my-6 mx-auto z-40 border-b-2 border-slate-200;
+}
+
+.page {
+	@apply max-w-screen-sm mx-auto px-2 pt-3 mt-3;
+}
+
 .label {
 	@apply font-bold;
 }

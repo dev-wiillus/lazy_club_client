@@ -7,10 +7,6 @@ import {
 	CreateContentVariables,
 } from '../../../__generated__/CreateContent';
 import {
-	FindContent,
-	FindContentVariables,
-} from '../../../__generated__/FindContent';
-import {
 	ContentStatusType,
 	CreateContentInput,
 } from '../../../__generated__/globalTypes';
@@ -18,7 +14,7 @@ import dynamic from 'next/dynamic';
 import useMe from '../../../utils/hooks/useMe';
 import { useRouter } from 'next/router';
 import ImageUpload from '../../../components/ImageUpload';
-import { CREATE_CONTENT_MUTATION } from '../../../services/channel/gql';
+import { CREATE_CONTENT_MUTATION } from '../../../services/content/gql';
 
 const DynamicComponent = dynamic(
 	() => import('../../../components/QuillEditor'),
@@ -109,7 +105,7 @@ const CreateContent: NextPage = () => {
 					<div className="form-control w-full space-y-2">
 						<label className="label" htmlFor="previewImage">
 							<span className="label-text">대표 이미지</span>
-						</label>
+						</label>Mutation
 						<ImageUpload formProps={register('previewImage')} />
 					</div>
 				</form>

@@ -35,15 +35,19 @@ const SignIn: NextPage = () => {
 	const { register, getValues, getFieldState, handleSubmit, formState } =
 		useForm<IForm>({ mode: 'onBlur' });
 	const router = useRouter();
-	const onCompleted = useCallback((data: LoginMutation) => {
+	const onCompleted = (data: LoginMutation) => {
 		const { ok, token } = data.login;
 		if (ok && token) {
 			localStorage.setItem(LOCALSTORAGE_TOKEN, token);
 			authToken(token);
 			isLoggedInVar(true);
-			router.push('/');
+			if (router.query.back) {
+				router.back();
+			} else {
+				router.push('/');
+			}
 		}
-	}, []);
+	};
 	const [loginMutation, { data: loginMutationResult, loading }] = useMutation<
 		LoginMutation,
 		LoginMutationVariables
@@ -63,7 +67,7 @@ const SignIn: NextPage = () => {
 		}
 	}, [loginMutation, getValues, onCompleted]);
 	return (
-		<>
+		<div className="page">
 			<Seo title="Sign In" />
 			<div className="hero min-h-screen">
 				<div className="hero-content flex-col">
@@ -138,7 +142,7 @@ const SignIn: NextPage = () => {
 					</div> */}
 				</div>
 			</div>
-		</>
+		</div>
 	);
 };
 
