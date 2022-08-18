@@ -1,9 +1,7 @@
 import type { NextPage } from 'next';
 import Seo from '../../../components/Seo';
 import { Controller, useForm } from 'react-hook-form';
-import Checkbox from '../../../components/Checkbox';
 import useMe from '../../../utils/hooks/useMe';
-import HtmlModalButton from '../../../components/HtmlModalButton';
 import { useMutation } from '@apollo/client';
 import { OPEN_ALERT_MUTATION } from '../../../services/channel/gql';
 import {
@@ -13,6 +11,7 @@ import {
 import { useRouter } from 'next/router';
 import MessageModal from '../../../components/Modal';
 import { useState } from 'react';
+import Agreement from 'components/Agreement';
 
 interface IForm {
 	name: string;
@@ -64,11 +63,9 @@ const ChannelReserve: NextPage = () => {
 		}
 	};
 
-	// TODO: 이용약관 html 문서 로드
-	// const html = serverPath('/public/docs/privacyPolicy.html');
 	return (
 		<>
-			<div className="grid grid-cols-1 p-16 gap-4">
+			<div className="grid grid-cols-1 my-28 gap-4">
 				<Seo title="Channel" />
 				<div className="hero h-auto bg-base-200 py-8">
 					<div className="hero-content text-center">
@@ -131,51 +128,7 @@ const ChannelReserve: NextPage = () => {
 							</div>
 						)}
 					/>
-					<div className="w-full space-y-2">
-						<label className="label">
-							<span className="label-text font-bold">이용약관</span>
-						</label>
-						<div className="pl-2">
-							<Controller
-								name="termsOfService"
-								control={control}
-								rules={{ required: '이용약관을 체크하세요.' }}
-								render={({ field, fieldState }) => (
-									<div className="form-control">
-										<Checkbox
-											inputProps={field}
-											labelText="(필수) 이용약관에 동의합니다."
-											extra={<HtmlModalButton html={''} />}
-										/>
-										{fieldState.error && (
-											<span className="text-error">
-												{fieldState.error.message}
-											</span>
-										)}
-									</div>
-								)}
-							/>
-							<Controller
-								name="privacyPolicy"
-								control={control}
-								rules={{ required: '개인정보처리방침을 체크하세요.' }}
-								render={({ field, fieldState }) => (
-									<div className="form-control">
-										<Checkbox
-											inputProps={field}
-											labelText="(필수) 개인정보처리방침에 동의합니다."
-											extra={<HtmlModalButton html={''} />}
-										/>
-										{fieldState.error && (
-											<span className="text-error">
-												{fieldState.error.message}
-											</span>
-										)}
-									</div>
-								)}
-							/>
-						</div>
-					</div>
+					<Agreement control={control} />
 					<button type="submit" className="btn btn-primary w-full">
 						알림 신청하기
 					</button>

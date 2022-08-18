@@ -18,7 +18,6 @@
 }
 
 .ql-container {
-	min-height: 30rem;
 }
 
 @tailwind utilities;

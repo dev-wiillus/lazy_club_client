@@ -1,13 +1,13 @@
-import type { NextPage } from 'next'
-import Seo from "../../../components/Seo";
+import type { NextPage } from 'next';
+import Seo from '../../../components/Seo';
 
 const Index: NextPage = () => {
-  return (
-      <>
-        <Seo title='Content' />
-    <h1>Content</h1>
-      </>
-  )
-}
+	return (
+		<>
+			<Seo title="Content" />
+			<h1>Content</h1>
+		</>
+	);
+};
 
-export default Index
+export default Index;

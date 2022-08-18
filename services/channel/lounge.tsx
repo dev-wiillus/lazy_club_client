@@ -7,7 +7,7 @@ import { UserRoleType } from '../../__generated__/globalTypes';
 export default function Lounge() {
 	const { data } = useMe();
 	const [linkUrl, btnText] = useMemo(() => {
-		if (data?.me.role === UserRoleType.Creator) {
+		if (data?.me.hasChannel) {
 			return ['/creator/channels', '내 채널로 이동하기'];
 		} else {
 			return ['/creator/channels/mutate', '채널 만들기'];
@@ -15,7 +15,7 @@ export default function Lounge() {
 	}, []);
 	return (
 		<>
-			<div className="snap-start h-screen flex flex-col gap-4">
+			<div className="snap-start h-screen flex flex-col justify-center gap-4">
 				<h1 className="text-5xl font-bold mt-32">Clubber's lounge</h1>
 				<h2 className="text-2xl">
 					성장을 위한 지식, 노하우, 일상을 기록하고, 당신만의 팬과 수익을

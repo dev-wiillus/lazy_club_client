@@ -1,6 +1,6 @@
 export default function Inform() {
 	return (
-		<div className="hero h-auto bg-base-200 py-8">
+		<div className="hero h-auto bg-base-200 py-8 shadow-xl">
 			<div className="hero-content text-center">
 				<div className="space-y-8">
 					<h2 className="text-3xl font-bold">

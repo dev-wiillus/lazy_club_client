@@ -8,34 +8,19 @@ const nextConfig = {
 	serverRuntimeConfig: {
 		PROJECT_ROOT: __dirname,
 	},
-	// async redirects() {
-	//   return [
-	//     {
-	//       source: "/old-blog/:path*",
-	//       destination: "/new-blog/:path*",
-	//       permanent: false,
-	//     }
-	//   ]
-	// },
-	// async rewrites() {
-	// 	return [
-	// 		{
-	// 			source: '/api/movies',
-	// 			destination: `https://api.themoviedb.org/3/movie/popular?api_key=${API_KEY}`,
-	// 		},
-	// 		{
-	// 			source: '/api/movies/:id',
-	// 			destination: `https://api.themoviedb.org/3/movie/:id?api_key=${API_KEY}`,
-	// 		},
-	// 		{
-	// 			source: '/api/movies/:id/lists',
-	// 			destination: `https://api.themoviedb.org/3/movie/:id/lists?api_key=${API_KEY}`,
-	// 		},
-	// 	];
-	// },
-	// images: {
-	// 	domains: ['image.tmdb.org',],
-	// },
+	env: {
+		NEXT_PUBLIC_BACKEND_URL: process.env.NEXT_PUBLIC_BACKEND_URL,
+	},
+	images: {
+		loader: 'imgix',
+		path: process.env.NEXT_PUBLIC_BACKEND_URL,
+	},
+	webpack5: true,
+	webpack: (config) => {
+		config.resolve.fallback = { fs: false };
+
+		return config;
+	},
 };
 
 module.exports = nextConfig;

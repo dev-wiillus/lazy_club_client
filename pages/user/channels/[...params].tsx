@@ -1,6 +1,6 @@
 import type { NextPage } from 'next';
 import Seo from '../../../components/Seo';
-import { useEffect, useMemo, useState } from 'react';
+import { useCallback, useEffect, useMemo, useState } from 'react';
 import { useRouter } from 'next/router';
 import { useLazyQuery } from '@apollo/client';
 import { FIND_CHANNEL_QUERY } from '../../../services/channel/gql';
@@ -12,6 +12,10 @@ import useMe from '../../../utils/hooks/useMe';
 import OpenAlertButton from '../../../components/OpenAlertButton';
 import LoginRequiredModal from '../../../components/LoginRequiredModal';
 import { modaleVar } from '../../../apollo';
+import { AlertSVG, ShareSVG } from 'components/icons';
+import { AddComma } from 'utils/number';
+import Image, { noImagePath } from 'components/Image';
+import FindAllContent from 'services/content/find-all';
 
 type ChannelDetailParams = string[] | undefined;
 
@@ -43,13 +47,16 @@ const ChannelDetail: NextPage<DetailProps> = ({ params }) => {
 	);
 	const { data: userData } = useMe();
 	const router = useRouter();
-	const onClick = (id: string, title: string) => {
-		if (!userData?.me) {
-			modaleVar(true);
-		} else {
-			router.push(`/user/contents/${title}/${id}`);
-		}
-	};
+	const onContentClick = useCallback(
+		(id: number) => {
+			if (!userData?.me) {
+				modaleVar(true);
+			} else {
+				router.push({ pathname: '/user/contents', query: { contentId: id } });
+			}
+		},
+		[userData?.me],
+	);
 	useEffect(() => {
 		if (channelId) {
 			request({
@@ -60,16 +67,21 @@ const ChannelDetail: NextPage<DetailProps> = ({ params }) => {
 				},
 			});
 		}
-	}, [channelId]);
-	const { title, thumbnail, description, operators, contents, categories } =
+	}, [request, channelId]);
+	const { title, thumbnail, description, operators, categories, alertsCount } =
 		data?.findChannel.results ?? {};
 	return (
 		<>
 			<Seo title={title ?? 'Channel'} />
-			<div className="flex flex-col gap-8 pt-16">
+			<div className="flex flex-col gap-8 my-28">
 				<div className="card bg-base-100 shadow-xl">
 					<figure>
-						<img src="https://placeimg.com/1000/800/arch" alt="channel-img" />
+						<Image
+							src={thumbnail ?? noImagePath}
+							alt="channel-img"
+							width={640}
+							height={480}
+						/>
 					</figure>
 					<div className="card-body">
 						<h2 className="card-title">
@@ -83,37 +95,11 @@ const ChannelDetail: NextPage<DetailProps> = ({ params }) => {
 				</div>
 				<div className="flex justify-evenly">
 					<button className="btn btn-ghost gap-2">
-						<svg
-							className="w-6 h-6"
-							fill="none"
-							stroke="currentColor"
-							viewBox="0 0 24 24"
-							xmlns="http://www.w3.org/2000/svg"
-						>
-							<path
-								strokeLinecap="round"
-								strokeLinejoin="round"
-								strokeWidth="2"
-								d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9"
-							/>
-						</svg>
-						110,222
+						<AlertSVG />
+						{AddComma(alertsCount ?? 0)}
 					</button>
 					<button className="btn btn-ghost gap-2">
-						<svg
-							className="w-6 h-6"
-							fill="none"
-							stroke="currentColor"
-							viewBox="0 0 24 24"
-							xmlns="http://www.w3.org/2000/svg"
-						>
-							<path
-								strokeLinecap="round"
-								strokeLinejoin="round"
-								strokeWidth="2"
-								d="M8.684 13.342C8.886 12.938 9 12.482 9 12c0-.482-.114-.938-.316-1.342m0 2.684a3 3 0 110-2.684m0 2.684l6.632 3.316m-6.632-6l6.632-3.316m0 0a3 3 0 105.367-2.684 3 3 0 00-5.367 2.684zm0 9.316a3 3 0 105.368 2.684 3 3 0 00-5.368-2.684z"
-							/>
-						</svg>
+						<ShareSVG />
 						공유
 					</button>
 					<OpenAlertButton channelId={channelId} />
@@ -164,27 +150,10 @@ const ChannelDetail: NextPage<DetailProps> = ({ params }) => {
 				</div>
 				<div className="grid grid-cols-1 p-6 gap-4" aria-label="tab container">
 					{tab === 0 ? (
-						<>
-							{contents?.map((content) => (
-								<div
-									onClick={() => onClick(content.id + '', content.title)}
-									className="card card-compact cursor-pointer bg-base-100 shadow-xl"
-									key={content.id}
-								>
-									<figure>
-										<img
-											src="https://placeimg.com/1000/800/arch"
-											alt="content-main-img"
-										/>
-									</figure>
-									<div className="card-body flex-row">
-										<div className="flex flex-col flex-1">
-											<h4 className="card-title">{content.title}</h4>
-										</div>
-									</div>
-								</div>
-							))}
-						</>
+						<FindAllContent
+							channelId={channelId}
+							onContentClick={onContentClick}
+						/>
 					) : (
 						<></>
 					)}

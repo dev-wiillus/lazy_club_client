@@ -1,8 +1,11 @@
 import { useApolloClient } from '@apollo/client';
 import { useRouter } from 'next/router';
 import { useCallback } from 'react';
-import { authToken } from '../../apollo';
-import { LOCALSTORAGE_TOKEN } from '../../utils/constants';
+import { authToken, roleModeVar } from '../../apollo';
+import {
+	LOCALSTORAGE_TOKEN,
+	LOCALSTORAGE_ROLE_MODE,
+} from '../../utils/constants';
 
 type InputProps = {
 	className?: string;
@@ -14,8 +17,9 @@ export default function SignOutButton({ className }: InputProps) {
 
 	const onClick = useCallback(() => {
 		localStorage.removeItem(LOCALSTORAGE_TOKEN);
+		localStorage.removeItem(LOCALSTORAGE_ROLE_MODE);
 		authToken(null);
-		// TODO: cache clear 제대로 되는지 확인
+		roleModeVar(null);
 		client.clearStore();
 		router.push('/sign-in');
 	}, [router]);

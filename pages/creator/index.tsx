@@ -7,10 +7,10 @@ const Creator: NextPage = () => {
 	return (
 		<>
 			<Seo title="Clubber Home" />
-			<div className="snap-start h-screen pt-16">
+			<div className="snap-start h-screen py-28">
 				<Home />
 			</div>
-			<div className="snap-start h-screen pt-16">
+			<div className="snap-start h-screen py-28">
 				<Lounge />
 			</div>
 		</>

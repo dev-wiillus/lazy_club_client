@@ -1,12 +1,72 @@
-import React, { useMemo, useCallback, memo } from 'react';
+import React, { useMemo, useCallback, memo, useRef, useState } from 'react';
 import styles from './quillEditor.module.css';
 import ReactQuill, { ReactQuillProps } from 'react-quill';
 import 'react-quill/dist/quill.snow.css'; // react-quill과 css파일 import 하기
+import { useMutation } from '@apollo/client';
+import { CREATE_CONTENT_FILE_MUTATION } from '../services/common/gql';
+import {
+	CreateContentFile,
+	CreateContentFileVariables,
+} from '../__generated__/CreateContentFile';
+import MessageModal from './Modal';
 
-type InputProps = Pick<ReactQuillProps, 'value' | 'onChange'>;
+type InputProps = ReactQuillProps & {
+	contentId?: number;
+};
 
-const QuillEditor = (props: InputProps) => {
-	const module = {
+const QuillEditor = ({ contentId, ...props }: InputProps) => {
+	const [request] = useMutation<CreateContentFile, CreateContentFileVariables>(
+		CREATE_CONTENT_FILE_MUTATION,
+	);
+	const QuillRef = useRef<ReactQuill>();
+	const [error, setError] = useState(false);
+
+	const imageHandler = useCallback(async () => {
+		const input = document.createElement('input');
+
+		input.setAttribute('type', 'file');
+		input.setAttribute('accept', 'image/*');
+		input.click();
+
+		input.onchange = async () => {
+			const files: FileList | null = input.files;
+			if (files !== null && contentId) {
+				try {
+					const file = files[0];
+					const { data } = await request({
+						variables: {
+							input: { file, isPreview: false, contentId },
+						},
+					});
+
+					const { ok, result } = data?.createContentFile ?? {};
+
+					if (ok) {
+						// 커서의 위치를 알고 해당 위치에 이미지 태그를 넣어주는 코드
+						const range = QuillRef.current?.getEditor().getSelection()?.index;
+						if (range !== null && range !== undefined) {
+							let quill = QuillRef.current?.getEditor();
+
+							quill?.setSelection(range, 1);
+
+							quill?.clipboard.dangerouslyPasteHTML(
+								range,
+								`<img src=${process.env.NEXT_PUBLIC_BACKEND_URL}/${result?.file} alt="image-tag" />`,
+							);
+						}
+
+						// return { ...res, success: true };
+					} else {
+						setError(true);
+					}
+				} catch (error) {
+					return error;
+				}
+			}
+		};
+	}, [request]);
+
+	const module: ReactQuillProps['modules'] = {
 		toolbar: {
 			container: [
 				['bold', 'italic', 'underline', 'strike', 'blockquote'],
@@ -20,99 +80,32 @@ const QuillEditor = (props: InputProps) => {
 				],
 				['image', 'video'],
 			],
-			//   handlers: {
-			// 	image: imageHandler,
-			//   },
+			handlers: {
+				image: imageHandler,
+			},
 		},
-		
 	};
 	return (
-		<ReactQuill
-			modules={module}
-			theme="snow"
-			
-			{...props}
-		/>
+		<>
+			<ReactQuill
+				ref={(element) => {
+					if (element !== null) {
+						QuillRef.current = element;
+					}
+				}}
+				modules={module}
+				theme="snow"
+				placeholder="내용을 입력해주세요."
+				{...props}
+			/>
+			<MessageModal
+				title="에러"
+				description="파일 업로드를 실패하였습니다."
+				state={error}
+				setState={setError}
+			/>
+		</>
 	);
 };
-
-// const QuillEditor = memo(({ quillRef, api, htmlContent, setHtmlContent }) => {
-//     // 툴바의 사진 아이콘 클릭시 기존에 작동하던 방식 대신에 실행시킬 핸들러를 만들어주자.
-//     const imageHandler = useCallback(() => {
-//         const formData = new FormData(); // 이미지를 url로 바꾸기위해 서버로 전달할 폼데이터 만들기
-
-//         const input = document.createElement("input"); // input 태그를 동적으로 생성하기
-//         input.setAttribute("type", "file");
-//         input.setAttribute("accept", "image/*"); // 이미지 파일만 선택가능하도록 제한
-//         input.setAttribute("name", "image");
-//         input.click();
-
-//         // 파일 선택창에서 이미지를 선택하면 실행될 콜백 함수 등록
-//         input.onchange = async () => {
-//             const file = input.files[0];
-//             formData.append("image", file); // 위에서 만든 폼데이터에 이미지 추가
-
-//             // 폼데이터를 서버에 넘겨 multer로 이미지 URL 받아오기
-//             const res = await api.uploadImage(formData);
-//             if (!res.success) {
-//                 alert("이미지 업로드에 실패하였습니다.");
-//             }
-//             const url = res.payload.url;
-//             const quill = quillRef.current.getEditor();
-//             /* ReactQuill 노드에 대한 Ref가 있어야 메서드들을 호출할 수 있으므로
-//             useRef()로 ReactQuill에 ref를 걸어주자.
-//             getEditor() : 편집기를 지원하는 Quill 인스턴스를 반환함
-//             여기서 만든 인스턴스로 getText()와 같은 메서드를 사용할 수 있다.*/
-
-//             const range = quill.getSelection()?.index;
-//             //getSelection()은 현재 선택된 범위를 리턴한다. 에디터가 포커싱되지 않았다면 null을 반환한다.
-
-//             if (typeof (range) !== "number") return;
-//             /*range는 0이 될 수도 있으므로 null만 생각하고 !range로 체크하면 잘못 작동할 수 있다.
-//             따라서 타입이 숫자이지 않을 경우를 체크해 리턴해주었다.*/
-
-//             quill.setSelection(range, 1);
-//             /* 사용자 선택을 지정된 범위로 설정하여 에디터에 포커싱할 수 있다.
-//                위치 인덱스와 길이를 넣어주면 된다.*/
-
-//             quill.clipboard.dangerouslyPasteHTML(
-//                 range,
-//                 `<img src=${url} alt="image" />`);
-//         }   //주어진 인덱스에 HTML로 작성된 내용물을 에디터에 삽입한다.
-//     }, [api, quillRef]);
-
-//     const modules = useMemo(
-//         () => ({
-//             toolbar: { // 툴바에 넣을 기능들을 순서대로 나열하면 된다.
-//                 container: [
-//                     ["bold", "italic", "underline", "strike", "blockquote"],
-//                     [{ size: ["small", false, "large", "huge"] }, { color: [] }],
-//                     [
-//                         { list: "ordered" },
-//                         { list: "bullet" },
-//                         { indent: "-1" },
-//                         { indent: "+1" },
-//                         { align: [] },
-//                     ],
-//                     ["image", "video"],
-//                 ],
-//                 handlers: { // 위에서 만든 이미지 핸들러 사용하도록 설정
-//                     image: imageHandler,
-//                 },
-//             },
-//         }), [imageHandler]);
-//     return (
-//         <>
-//             <ReactQuill
-//                 ref={quillRef}
-//                 value={htmlContent}
-//                 onChange={setHtmlContent}
-//                 modules={modules}
-//                 theme="snow"
-//                 className={styles.quillEditor}
-//             />
-//         </>
-//     )
-// })
 
 export default QuillEditor;

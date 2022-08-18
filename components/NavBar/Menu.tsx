@@ -3,6 +3,7 @@ import { useRouter } from 'next/router';
 import Link from 'next/link';
 import useRole from '../../utils/hooks/useRole';
 import { UserRoleType } from '../../__generated__/globalTypes';
+import useMe from 'utils/hooks/useMe';
 
 export type NavItemType = {
 	href: string;
@@ -28,6 +29,7 @@ function NavItem({ href, text }: NavItemType) {
 
 export default function Menu() {
 	const [role] = useRole();
+	const { data } = useMe();
 	const navItems: NavItemType[] = [
 		{
 			href: `/${role?.toLowerCase()}`,
@@ -35,11 +37,13 @@ export default function Menu() {
 		},
 	];
 
-	if (role === UserRoleType.Creator) {
-		navItems.splice(1, 0, {
-			href: `/creator/channels`,
-			text: 'Channel',
-		});
+	if (data?.me.role) {
+		if (data?.me.role !== UserRoleType.User && role === UserRoleType.Creator) {
+			navItems.splice(1, 0, {
+				href: `/creator/channels`,
+				text: 'Channel',
+			});
+		}
 	}
 	return (
 		<div className="dropdown">

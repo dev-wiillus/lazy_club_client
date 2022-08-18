@@ -1,7 +1,8 @@
 import Image, { ImageProps } from 'next/image';
 import React from 'react';
-import blackLogo from '../public/LAZYBLUB_blk.png';
-import whiteLogo from '../public/LAZYBLUB_white.png';
+
+export const whiteLogoUrl = `/images/LAZYBLUB_white.png`;
+export const blackLogoUrl = `/images/LAZYBLUB_blk.png`;
 
 type InputProps = Omit<ImageProps, 'src'> & {
 	color?: 'black' | 'white';
@@ -10,9 +11,11 @@ type InputProps = Omit<ImageProps, 'src'> & {
 export default function Logo({ color, ...props }: InputProps) {
 	return (
 		<Image
-			src={color === 'white' ? whiteLogo : blackLogo}
+			src={color === 'white' ? whiteLogoUrl : blackLogoUrl}
 			alt="logo"
 			style={{ verticalAlign: 'bottom' }}
+			width={200}
+			height={50}
 			{...props}
 		/>
 	);

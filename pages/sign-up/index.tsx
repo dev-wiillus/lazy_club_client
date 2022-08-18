@@ -1,8 +1,7 @@
 import type { NextPage } from 'next';
 import { useCallback, useState } from 'react';
-import { isLoggedInVar } from '../../apollo';
 import Logo from '../../components/Logo';
-import { Controller, useForm } from 'react-hook-form';
+import { useForm } from 'react-hook-form';
 import { FormError } from '../../components/FormError';
 import { gql, useMutation } from '@apollo/client';
 import { Button } from '../../components/Button';

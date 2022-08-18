@@ -51,7 +51,9 @@ const SignIn: NextPage = () => {
 	const [loginMutation, { data: loginMutationResult, loading }] = useMutation<
 		LoginMutation,
 		LoginMutationVariables
-	>(LOGIN_MUTATION);
+	>(LOGIN_MUTATION, {
+		onCompleted,
+	});
 	const onSubmit = useCallback(() => {
 		if (!loading) {
 			const { email, password } = getValues();
@@ -62,10 +64,9 @@ const SignIn: NextPage = () => {
 						password,
 					},
 				},
-				onCompleted,
 			});
 		}
-	}, [loginMutation, getValues, onCompleted]);
+	}, [loginMutation, getValues]);
 	return (
 		<div className="page">
 			<Seo title="Sign In" />

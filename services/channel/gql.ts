@@ -11,6 +11,7 @@ export const FIND_ALL_CHANNEL_QUERY = gql`
                 id
                 title
                 thumbnail
+				description
                 operators {
                     user {
                         name
@@ -22,6 +23,7 @@ export const FIND_ALL_CHANNEL_QUERY = gql`
                         name
                     }
                 }
+				alertsCount
             }
         }
     }
@@ -60,6 +62,8 @@ export const FIND_CHANNEL_QUERY = gql`
 						isPreview
 					}
 				}
+				hasDraftContent
+				alertsCount
 				agentIntroduction
 				termsOfService
 				agreements
@@ -96,6 +100,8 @@ export const CREATE_CHANNEL_MUTATION = gql`
 						name
 					}
 				}
+				hasDraftContent
+				alertsCount
 				agentIntroduction
 				termsOfService
 				agreements
@@ -125,3 +131,23 @@ export const OPEN_ALERT_MUTATION = gql`
 		}
 	}
 `;
+
+export const UPLOAD_USER_FILE_MUTATION = gql`
+	mutation UploadUserFile($input: UploadUserFileInput!){
+		uploadUserFile(input: $input){
+			ok
+			error
+			filePath
+		}
+	}
+`
+
+export const UPLOAD_CHANNEL_FILE_MUTATION = gql`
+	mutation UploadChannelFile($input: UploadChannelFileInput!){
+		uploadChannelFile(input: $input){
+			ok
+			error
+			filePath
+		}
+	}
+`

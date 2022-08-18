@@ -1,9 +1,12 @@
 import { gql, useApolloClient, useMutation, useQuery } from '@apollo/client';
+import ImagePreviewInput from 'components/ImagePreviewInput';
 import { NextPage } from 'next';
 import { useRouter } from 'next/router';
-import { useForm } from 'react-hook-form';
+import { useEffect } from 'react';
+import { useFieldArray, useForm } from 'react-hook-form';
+import PrivacyPolicyButton from 'services/common/PrivacyPolicyButton';
+import TermsOfServiceButton from 'services/common/TermsOfServiceButton';
 import Checkbox from '../../../components/Checkbox';
-import ImageUpload from '../../../components/ImageUpload';
 import {
 	CREATE_CHANNEL_MUTATION,
 	FIND_ALL_TAG_OPTIONS,
@@ -15,19 +18,21 @@ import {
 	CreateChannelVariables,
 } from '../../../__generated__/CreateChannel';
 import { FindAllTagOptions } from '../../../__generated__/FindAllTagOptions';
-import {
-	CreateChannelInput,
-	InviteChannelOperatorInput,
-} from '../../../__generated__/globalTypes';
+import { CreateChannelInput } from '../../../__generated__/globalTypes';
 
-type IForm = CreateChannelInput &
-	InviteChannelOperatorInput & {
-		userNickname: string;
-		userProfile?: string;
-	};
+type EmailFieldValues = {
+	value: string;
+};
+
+type IForm = Omit<CreateChannelInput, 'thumbnail' | 'userProfile' | 'tagId'> & {
+	emails: EmailFieldValues[];
+	userNickname: string;
+	userProfile?: File[];
+	thumbnail?: File[];
+	tagId?: number | string;
+};
 
 // TODO: creator만 가능
-// TODO: checkbox, image upload, form list
 // TODO: validation
 const MutateChannel: NextPage = () => {
 	const router = useRouter();
@@ -38,11 +43,8 @@ const MutateChannel: NextPage = () => {
 		const {
 			createChannel: { ok, result },
 		} = data;
-		console.log(data);
 		if (ok && result) {
 			const { __typename, id, ...data } = result;
-			// cache 잘바뀌는지 확인
-			// id 가져오기
 			client.writeFragment({
 				id: `ChannelOutput:${id}`,
 				fragment: gql`
@@ -62,6 +64,8 @@ const MutateChannel: NextPage = () => {
 								name
 							}
 						}
+						hasDraftContent
+						alertsCount
 						agentIntroduction
 						termsOfService
 						agreements
@@ -69,7 +73,7 @@ const MutateChannel: NextPage = () => {
 				`,
 				data,
 			});
-			router.push(`/${role}/channels`);
+			router.push(`/${role?.toLowerCase()}/channels`);
 		}
 	};
 	const [mutateChannel, { loading }] = useMutation<
@@ -79,52 +83,73 @@ const MutateChannel: NextPage = () => {
 		onCompleted,
 	});
 
-	const { register, handleSubmit, getValues, control } = useForm<IForm>({
-		defaultValues: {
-			tagId: undefined,
-		},
+	const { register, handleSubmit, getValues, setValue, control } =
+		useForm<IForm>({
+			defaultValues: {
+				tagId: '',
+			},
+		});
+	const { fields, append } = useFieldArray<IForm>({
+		control,
+		name: 'emails',
 	});
 	const onSubmit = () => {
-		if (userData?.me.email) {
-			const {
-				title,
-				description,
-				tagId,
-				thumbnail,
-				emails,
-				agentIntroduction,
-				termsOfService,
-				agreements,
-			} = getValues();
+		const {
+			title,
+			description,
+			tagId,
+			thumbnail,
+			userProfile,
+			emails,
+			agentIntroduction,
+			termsOfService,
+			agreements,
+		} = getValues();
+		if (userData?.me.email && tagId) {
 			mutateChannel({
 				variables: {
 					channelInput: {
 						title,
 						description,
-						tagId,
+						tagId: +tagId,
 						agentIntroduction,
 						termsOfService,
 						agreements,
-						...(!thumbnail && { thumbnail }),
+						...(thumbnail && { thumbnail: thumbnail[0] }),
+						...(userProfile && { userProfile: userProfile[0] }),
 					},
 					channelOperatorInput: {
-						emails: [userData?.me.email],
+						emails:
+							emails
+								?.filter((email) => !!email.value)
+								.map((email) => email.value) ?? [],
 					},
 				},
 			});
 		}
 	};
 
+	useEffect(() => {
+		const defaultValues: Partial<IForm> = {
+			userNickname: userData?.me.nickname,
+		};
+		if (defaultValues) {
+			Object.entries(defaultValues).forEach(([name, value]: any) =>
+				setValue(name, value),
+			);
+		}
+	}, [setValue, userData]);
+
 	const { data: tagOptionsData, loading: tagOptionsLoading } =
 		useQuery<FindAllTagOptions>(FIND_ALL_TAG_OPTIONS, { ssr: true });
 	return (
-		<div className="py-4">
-			<form className="form space-y-4" onSubmit={handleSubmit(onSubmit)}>
+		<div className="my-28">
+			<form className="form space-y-8" onSubmit={handleSubmit(onSubmit)}>
 				<div className="form-control w-full space-y-2">
 					<label className="label" htmlFor="thumbnail">
 						<span className="label-text">채널 썸네일</span>
 					</label>
-					<ImageUpload formProps={register('thumbnail')} />
+					<ImagePreviewInput {...register('thumbnail')} />
 				</div>
 
 				<div className="form-control w-full space-y-2">
@@ -145,12 +170,16 @@ const MutateChannel: NextPage = () => {
 					</label>
 					<select
 						className="select select-bordered w-full"
-						placeholder="채널 태그를 선택하세요."
 						{...register('tagId', { required: true })}
 					>
+						<option disabled value="">
+							채널 태그를 선택하세요.
+						</option>
 						{tagOptionsData?.findAllTagOptions.results?.map(
 							({ value, label }) => (
-								<option value={+value}>{label}</option>
+								<option key={value} value={+value}>
+									{label}
+								</option>
 							),
 						)}
 					</select>
@@ -161,7 +190,7 @@ const MutateChannel: NextPage = () => {
 					</label>
 					<textarea
 						id="description"
-						className="textarea textarea-bordered h-24"
+						className="textarea textarea-bordered"
 						{...register('description', { required: true })}
 					/>
 				</div>
@@ -173,6 +202,7 @@ const MutateChannel: NextPage = () => {
 						id="userNickname"
 						type="text"
 						className="input input-bordered w-full"
+						disabled
 						{...register('userNickname')}
 					/>
 				</div>
@@ -180,94 +210,72 @@ const MutateChannel: NextPage = () => {
 					<label className="label" htmlFor="userProfile">
 						<span className="label-text">대표 운영자 프로필</span>
 					</label>
-					<ImageUpload formProps={register('userProfile')} />
+					<ImagePreviewInput {...register('userProfile')} />
 				</div>
 				<div className="form-control w-full space-y-2">
 					<label className="label" htmlFor="agentIntroduction">
 						<span className="label-text">대표 운영자 소개</span>
 					</label>
-					<input
+					<textarea
 						id="agentIntroduction"
-						type="text"
-						className="input input-bordered w-full"
+						className="textarea textarea-bordered"
 						{...register('agentIntroduction')}
 					/>
 				</div>
-				<div>공동 운영자 초대</div>
+				<div className="form-control w-full space-y-2">
+					<label className="label">
+						<span className="label-text">공동 운영자 초대</span>
+					</label>
+					{fields.map((item, index) => (
+						<div key={index}>
+							<input
+								id="agentIntroduction"
+								type="email"
+								className="input input-bordered w-full"
+								style={{ margin: 'dense' }}
+								placeholder="이메일을 입력하세요."
+								{...register(`emails.${index}.value` as const)}
+							/>
+						</div>
+					))}
+					<button
+						className="btn btn-secondary"
+						type="button"
+						onClick={() => {
+							append({ value: '' });
+						}}
+					>
+						공동 운영자 추가
+					</button>
+				</div>
 				<div className="w-full space-y-2">
 					<label className="label">
-						<span className="label-text font-bold">정책 동의</span>
+						<span className="label-text font-bold">이용약관</span>
 					</label>
 					<div className="pl-2">
 						<div className="form-control">
 							<Checkbox
-								inputProps={register('termsOfService')}
-								labelText="(필수) 이용 약관에 동의합니다."
-								extra={
-									<label
-										htmlFor="termsOfService-modal"
-										className="btn btn-ghost btn-modal"
-									>
-										모두 보기
-									</label>
-								}
+								inputProps={{
+									...register('termsOfService', {
+										required: '이용약관을 체크하세요.',
+									}),
+									required: true,
+								}}
+								labelText="(필수) 이용약관에 동의합니다."
+								extra={<TermsOfServiceButton />}
 							/>
-							<input
-								type="checkbox"
-								id="termsOfService-modal"
-								className="modal-toggle"
-							/>
-							<div className="modal">
-								<div className="modal-box">
-									<h3 className="font-bold text-lg">
-										Congratulations random Internet user!
-									</h3>
-									<p className="py-4">
-										You've been selected for a chance to get one year of
-										subscription to use Wikipedia for free!
-									</p>
-									<div className="modal-action">
-										<label htmlFor="termsOfService-modal" className="btn">
-											Yay!
-										</label>
-									</div>
-								</div>
-							</div>
 						</div>
 						<div className="form-control">
 							<Checkbox
-								inputProps={register('agreements')}
+								inputProps={{
+									...register('agreements', {
+										required: '개인정보처리방침을 체크하세요.',
+									}),
+									required: true,
+								}}
 								labelText="(필수) 개인정보처리방침에 동의합니다."
-								extra={
-									<label
-										htmlFor="agreements-modal"
-										className="btn btn-ghost btn-modal"
-									>
-										모두 보기
-									</label>
-								}
+								extra={<PrivacyPolicyButton />}
 							/>
-							<input
-								type="checkbox"
-								id="agreements-modal"
-								className="modal-toggle"
-							/>
-							<div className="modal">
-								<div className="modal-box">
-									<h3 className="font-bold text-lg">
-										Congratulations random Internet user!
-									</h3>
-									<p className="py-4">
-										You've been selected for a chance to get one year of
-										subscription to use Wikipedia for free!
-									</p>
-									<div className="modal-action">
-										<label htmlFor="agreements-modal" className="btn">
-											Yay!
-										</label>
-									</div>
-								</div>
-							</div>
 						</div>
 					</div>
 				</div>

@@ -1,19 +1,6 @@
-import { gql, useQuery } from "@apollo/client";
+import { useQuery } from "@apollo/client";
+import { ME_QUERY } from "services/user/gql";
 import { MeQuery } from "../../__generated__/MeQuery";
-
-const ME_QUERY = gql`
-query MeQuery {
-    me {
-        id
-        email
-        name
-        phone
-        nickname
-        role
-        verified
-    }
-}
-`;
 
 const useMe = () => {
     return useQuery<MeQuery>(ME_QUERY);

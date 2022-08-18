@@ -14,13 +14,16 @@ export default function Checkbox({
 	defaultChecked,
 	extra,
 }: CheckboxProps) {
-	const [checked, check] = useState(defaultChecked);
+	// const [checked, check] = useState(defaultChecked);
+	// const onCheck = () => {
+	// 	check(!checked)
+	// }
 	return (
 		<label className="label cursor-pointer justify-start space-x-2">
 			<input
 				type="checkbox"
-				checked={checked}
-				onClick={() => check(!checked)}
+				// checked={checked}
+				// onClick={() => check(!checked)}
 				className="checkbox checkbox-primary"
 				{...inputProps}
 			/>

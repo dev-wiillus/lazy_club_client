@@ -94,7 +94,7 @@ const EditProfile: NextPage = () => {
 	return (
 		<>
 			<Seo title="Edit Profile" />
-			<div className="hero min-h-screen">
+			<div className="hero min-h-screen my-28">
 				<div className="hero-content flex-col">
 					<form className="form space-y-4" onSubmit={handleSubmit(onSubmit)}>
 						<input

@@ -1,9 +1,9 @@
-import { gql, useLazyQuery, useQuery } from '@apollo/client';
+import { useLazyQuery, useMutation } from '@apollo/client';
 import type { NextPage } from 'next';
-import Image from 'next/image';
+import Image, { noImagePath } from 'components/Image';
 import Link from 'next/link';
 import { useRouter } from 'next/router';
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import Seo from '../../../components/Seo';
 import useMe from '../../../utils/hooks/useMe';
 import useRole from '../../../utils/hooks/useRole';
@@ -11,8 +11,17 @@ import {
 	FindChannel,
 	FindChannelVariables,
 } from '../../../__generated__/FindChannel';
-import lazyClubLogo from '../../../public/LAZYBLUB_blk.png';
 import { FIND_CHANNEL_QUERY } from '../../../services/channel/gql';
+import {
+	CreateContent,
+	CreateContentVariables,
+} from '__generated__/CreateContent';
+import { CREATE_CONTENT_MUTATION } from 'services/content/gql';
+import { ContentStatusType } from '__generated__/globalTypes';
+import MessageModal from 'components/Modal';
+import FindAllContent from 'services/content/find-all';
+import { AlertSVG } from 'components/icons';
+import { AddComma } from 'utils/number';
 
 const Channels: NextPage = () => {
 	const [role] = useRole();
@@ -23,6 +32,7 @@ const Channels: NextPage = () => {
 		FindChannelVariables
 	>(FIND_CHANNEL_QUERY, {
 		ssr: true,
+		fetchPolicy: 'no-cache',
 	});
 
 	useEffect(() => {
@@ -30,7 +40,7 @@ const Channels: NextPage = () => {
 			request({
 				variables: {
 					input: {
-						operatorId: userData?.me.id,
+						userId: userData?.me.id,
 					},
 				},
 			});
@@ -39,121 +49,109 @@ const Channels: NextPage = () => {
 	const {
 		id: channelId,
 		thumbnail,
-		contents,
+		hasDraftContent,
+		alertsCount,
 	} = data?.findChannel.results ?? {};
-	const contentUrl = `/${role}/contents`;
-	const createUrl = `${contentUrl}/create`;
+	const contentUrl = `/${role?.toLowerCase()}/contents`;
 	const updateUrl = `${contentUrl}/update`;
 
-	const onContentClick = () => {
-		router.push(
-			{
+	const onContentClick = (id: number) => {
+		router.push({
+			pathname: updateUrl,
+			query: { contentId: id },
+		});
+	};
+
+	const [createContentError, setCreateContentError] = useState(false);
+	const onCompleted = (data: CreateContent) => {
+		if (data.createContent.ok) {
+			router.push({
 				pathname: updateUrl,
-				query: { status: 'NORMAL', channelId },
-			},
-			updateUrl,
-		);
+				query: { contentId: data.createContent.results?.id },
+			});
+		} else {
+			setCreateContentError(true);
+		}
+	};
+	const [createContent] = useMutation<CreateContent, CreateContentVariables>(
+		CREATE_CONTENT_MUTATION,
+		{
+			onCompleted,
+		},
+	);
+
+	const onCreateContentClick = async () => {
+		console.log(channelId);
+		if (channelId) {
+			await createContent({
+				variables: {
+					input: {
+						channelId,
+						status: ContentStatusType.PENDING,
+					},
+				},
+			});
+		}
 	};
 	return (
-		<div className="grid grid-cols-1 p-6 gap-8">
-			<Seo title="Channel" />
-			<div>
-				<h3 className="text-base mb-2 font-medium">clubber's lounge</h3>
-				<div className="flex gap-4 justify-end">
-					<Link
-						href={{
-							pathname: createUrl,
-							query: { status: 'NORMAL', channelId },
-						}}
-						as={createUrl}
-					>
-						<button className="btn">새 콘텐츠</button>
-					</Link>
-					<Link
-						href={{
-							pathname: updateUrl,
-							query: { status: 'DRAFT', channelId },
-						}}
-						as={updateUrl}
-					>
-						<button className="btn">임시 저장</button>
-					</Link>
-				</div>
-			</div>
-			<div className="grid grid-cols-1 gap-8">
+		<>
+			<div className="grid grid-cols-1 p-6 gap-8 my-28">
+				<Seo title="Channel" />
 				<div>
-					<h3 className="text-base mb-2 font-medium">내 채널</h3>
-					<div>
-						<Image
-							src={lazyClubLogo}
-							alt="channel-image"
-							width="500px"
-							height="96rem"
-						/>
+					<h3 className="text-xl mb-2 font-bold">clubber's lounge</h3>
+					<div className="flex gap-4 justify-end">
+						<button className="btn" onClick={onCreateContentClick}>
+							새 콘텐츠
+						</button>
+						<Link
+							href={{
+								pathname: updateUrl,
+								query: { channelId },
+							}}
+						>
+							<a>
+								<button className="btn" disabled={!hasDraftContent}>
+									임시 저장 불러오기
+								</button>
+							</a>
+						</Link>
 					</div>
 				</div>
-				{/* <div className="grid grid-cols-3">
+				<div className="grid grid-cols-1 gap-8">
 					<div>
-						<h3 className="text-base mb-2 font-medium">구독자 수</h3>
-						<div></div>
+						<h3 className="text-base mb-2 font-bold">내 채널</h3>
+						<div>
+							<Image
+								src={thumbnail ?? noImagePath}
+								alt="channel-image"
+								width="500px"
+								height="300px"
+							/>
+						</div>
+						<div className="stat shadow-xl">
+							<div className="stat-figure text-primary">
+								<AlertSVG />
+							</div>
+							<div className="stat-title">채널 오픈 알림 예약</div>
+							<div className="stat-value text-primary">
+								{AddComma(alertsCount ?? 0)}
+							</div>
+							<div className="stat-desc">사전 신청자 수</div>
+						</div>
 					</div>
 					<div>
-						<h3 className="text-base mb-2 font-medium">조회 수</h3>
-						<div></div>
-					</div>
-					<div>
-						<h3 className="text-base mb-2 font-medium">좋아요 수</h3>
-						<div></div>
-					</div>
-				</div> */}
-				<div>
-					<h3 className="text-base mb-2 font-medium">인기 콘텐츠</h3>
-					<div>
-						{contents?.map(({ id, title, category, hit, contentFiles }) => {
-							const { file: mainImageUrl = '' } =
-								contentFiles?.find((content) => content.isPreview) ?? {};
-							return (
-								<div
-									onClick={onContentClick}
-									className="card card-side cursor-pointer shadow-xl"
-									key={id}
-								>
-									<Image
-										src={mainImageUrl}
-										alt="content-main-image"
-										width={200}
-										height={200}
-									/>
-									<div className="card-body flex-row">
-										<div className="flex flex-col flex-1">
-											<h4 className="card-title">{title}</h4>
-											<p>{category}</p>
-										</div>
-										<div className="card-actions items-center">
-											<svg
-												className="w-6 h-6"
-												fill="none"
-												stroke="currentColor"
-												viewBox="0 0 24 24"
-												xmlns="http://www.w3.org/2000/svg"
-											>
-												<path
-													strokeLinecap="round"
-													strokeLinejoin="round"
-													strokeWidth="2"
-													d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9"
-												/>
-											</svg>
-											<div className="badge badge-sm">{hit}</div>
-										</div>
-									</div>
-								</div>
-							);
-						})}
+						<h3 className="text-base mb-2 font-bold">인기 콘텐츠</h3>
+						<FindAllContent channelId={channelId} onContentClick={onContentClick} />
 					</div>
 				</div>
 			</div>
-		</div>
+			<MessageModal
+				title="에러"
+				description="콘텐츠 페이지 이동 에러"
+				state={createContentError}
+				setState={setCreateContentError}
+			/>
+		</>
 	);
 };
 

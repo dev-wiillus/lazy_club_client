@@ -1,6 +1,14 @@
+import { useLazyQuery, useQuery } from '@apollo/client';
 import { useRouter } from 'next/router';
+import { useEffect } from 'react';
+import { CHECK_OPEN_ALERT_QUERY } from 'services/user/gql';
+import {
+	CheckOpenAlertQuery,
+	CheckOpenAlertQueryVariables,
+} from '__generated__/CheckOpenAlertQuery';
 import { modaleVar } from '../apollo';
 import useMe from '../utils/hooks/useMe';
+import { MailSVG } from './icons';
 
 type InputProps = {
 	channelId?: number | string;
@@ -8,6 +16,10 @@ type InputProps = {
 
 export default function OpenAlertButton({ channelId }: InputProps) {
 	const { data: userData } = useMe();
+	const [request, { data }] = useLazyQuery<
+		CheckOpenAlertQuery,
+		CheckOpenAlertQueryVariables
+	>(CHECK_OPEN_ALERT_QUERY);
 	const router = useRouter();
 	const onClick = () => {
 		if (!userData?.me) {
@@ -16,21 +28,27 @@ export default function OpenAlertButton({ channelId }: InputProps) {
 			router.push({ pathname: '/user/channels/reserve', query: { channelId } });
 		}
 	};
+	useEffect(() => {
+		if (channelId) {
+			request({
+				variables: {
+					input: {
+						channelId: +channelId,
+					},
+				},
+			});
+		}
+	}, [channelId]);
 	return (
-		<button className="btn btn-primary gap-2" onClick={onClick}>
-			<svg
-				className="w-6 h-6"
-				fill="currentColor"
-				viewBox="0 0 20 20"
-				xmlns="http://www.w3.org/2000/svg"
+		<>
+			<button
+				className="btn btn-primary gap-2"
+				disabled={data?.checkOpenAlert}
+				onClick={onClick}
 			>
-				<path
-					fillRule="evenodd"
-					d="M2.94 6.412A2 2 0 002 8.108V16a2 2 0 002 2h12a2 2 0 002-2V8.108a2 2 0 00-.94-1.696l-6-3.75a2 2 0 00-2.12 0l-6 3.75zm2.615 2.423a1 1 0 10-1.11 1.664l5 3.333a1 1 0 001.11 0l5-3.333a1 1 0 00-1.11-1.664L10 11.798 5.555 8.835z"
-					clipRule="evenodd"
-				></path>
-			</svg>
-			채널 오픈 알림 신청
-		</button>
+				<MailSVG />
+				채널 오픈 알림 신청
+			</button>
+		</>
 	);
 }
