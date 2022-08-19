@@ -9,8 +9,8 @@ export default function Home() {
 			style={{ backgroundImage: 'url(https://placeimg.com/1000/800/arch)' }}
 		>
 			<div className="hero-overlay bg-opacity-60" />
-			<div className="hero-content text-white font-medium">
-				<div className="max-w-md">
+			<div className="hero-content">
+				<div className="max-w-md text-white font-medium">
 					{page === 0 ? (
 						<>
 							<h2 className="mb-3 text-3xl text-center">
