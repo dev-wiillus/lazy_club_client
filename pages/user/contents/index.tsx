@@ -40,7 +40,7 @@ const Index: NextPage = () => {
 				<input
 					id="title"
 					type="text"
-					className="input input-bordered w-full text-xl placeholder:text-gray-300 border-none"
+					className="input input-bordered w-full text-3xl placeholder:text-gray-300 border-none"
 					value={results?.title ?? ''}
 					readOnly
 				/>
