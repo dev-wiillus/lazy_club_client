@@ -26,6 +26,11 @@ const ImagePreviewInput = React.forwardRef<HTMLInputElement, InputProps>(
 				const files = e.target.files;
 				if (files && files.length === 1 && onChange) {
 					const file = files[0];
+					// TODO: 1MB 넘어가면 에러
+					if (file.size > 1000000) {
+						new Error('이미지 크기가 1MB보다 큽니다.');
+						return;
+					}
 					encodeFileToBase64(file);
 					onChange(e);
 				}

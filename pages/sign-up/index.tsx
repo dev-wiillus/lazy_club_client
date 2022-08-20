@@ -14,15 +14,7 @@ import {
 import { emailPattern } from '../../utils/patterns';
 import { useRouter } from 'next/router';
 import MessageModal from '../../components/Modal';
-
-const REGISTER_MUTATION = gql`
-	mutation RegisterMutation($input: RegisterInput!) {
-		register(input: $input) {
-			ok
-			error
-		}
-	}
-`;
+import { REGISTER_MUTATION } from 'services/user/gql';
 
 interface IForm {
 	name: string;

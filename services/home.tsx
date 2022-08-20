@@ -9,20 +9,22 @@ export default function Home() {
 			style={{ backgroundImage: 'url(https://placeimg.com/1000/800/arch)' }}
 		>
 			<div className="hero-overlay bg-opacity-60" />
-			<div className="hero-content">
-				<div className="max-w-md text-white font-medium">
+			<div className="hero-content text-white font-medium">
+				<div className="max-w-md">
 					{page === 0 ? (
 						<>
 							<h2 className="mb-3 text-3xl text-center">
 								성장하는 사람들의 지식 노트
 							</h2>
-							<Logo color="white" />
-							<button
-								className="btn btn-primary mt-5 ml-5 w-32"
-								onClick={() => setPage(1)}
-							>
-								더 알아보기
-							</button>
+							<p className="flex">
+								<Logo color="white" />
+								<button
+									className="btn btn-primary ml-5 w-32"
+									onClick={() => setPage(1)}
+								>
+									더 알아보기
+								</button>
+							</p>
 						</>
 					) : (
 						<div className="flex flex-col gap-12">

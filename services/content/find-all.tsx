@@ -37,17 +37,15 @@ export default function FindAll({ channelId, onContentClick }: InputProps) {
 	const contents = data?.findAllContent.results;
 	return (
 		<div>
-			{contents?.map(({ id, title, category, hit, contentFiles }) => {
-				const { file: mainImageUrl } =
-					contentFiles?.find((content) => content.isPreview) ?? {};
+			{contents?.map(({ id, title, category, hit, previewImageUrl }) => {
 				return (
 					<div
 						onClick={() => onContentClick(id)}
-						className="card card-side cursor-pointer shadow-xl"
+						className="card card-side cursor-pointer shadow-xl mt-2"
 						key={id}
 					>
 						<Image
-							src={mainImageUrl ?? noImagePath}
+							src={previewImageUrl ?? noImagePath}
 							alt="content-main-image"
 							width={200}
 							height={200}

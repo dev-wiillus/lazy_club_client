@@ -1,12 +1,6 @@
-import {
-	gql,
-	useApolloClient,
-	useLazyQuery,
-	useMutation,
-	useQuery,
-} from '@apollo/client';
+import { useApolloClient, useLazyQuery, useMutation } from '@apollo/client';
 import { NextPage } from 'next';
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useForm } from 'react-hook-form';
 import {
 	EditContent,
@@ -126,16 +120,17 @@ const UpdateContent: NextPage = () => {
 	const [status, setStatus] = useState<ContentStatusType>();
 
 	const onSubmit = async () => {
-		if (userData?.me.email) {
+		console.log();
+		if (userData?.me.email && results?.id) {
 			const { id, title, content, previewImage } = getValues();
-
+			console.log(getValues());
 			const htmlContent = new File([content], 'content.html', {
 				type: 'text/html',
 			});
 			editContent({
 				variables: {
 					input: {
-						id,
+						id: results.id,
 						title,
 						content: htmlContent,
 						status,
@@ -171,10 +166,9 @@ const UpdateContent: NextPage = () => {
 							</button>
 						</div>
 						<div className="form-control w-full space-y-2">
-							<input
+							<textarea
 								id="title"
-								type="text"
-								className="input input-bordered w-full text-3xl placeholder:text-gray-300"
+								className="textarea textarea-bordered w-full text-3xl placeholder:text-gray-300"
 								placeholder="제목을 입력하세요"
 								{...register('title', { required: true })}
 							/>
@@ -184,12 +178,12 @@ const UpdateContent: NextPage = () => {
 							onChange={onEditorStateChange}
 							contentId={results?.id}
 						/>
-						<div className="form-control w-full space-y-2">
+						<div className="form-control w-1/2 mx-auto mt-8 gap-2">
 							<label className="label">
 								<span className="label-text">대표 이미지</span>
 							</label>
 							<ImagePreviewInput
-								imgSrc={results?.previewImage}
+								imgSrc={results?.previewImageUrl}
 								{...register('previewImage')}
 							/>
 						</div>

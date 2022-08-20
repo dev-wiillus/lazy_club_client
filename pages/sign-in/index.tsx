@@ -74,7 +74,7 @@ const SignIn: NextPage = () => {
 				<div className="hero-content flex-col">
 					<div className="text-center">
 						<h2 className="text-xl">성공하는 사람들의 성장 습관</h2>
-						<Logo />
+						<Logo width={300} height={50} />
 						<h3 className="text-2xl font-bold">로그인</h3>
 					</div>
 					<form className="form space-y-4" onSubmit={handleSubmit(onSubmit)}>

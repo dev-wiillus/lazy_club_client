@@ -14,6 +14,7 @@ export const FIND_ALL_CONTENT_QUERY = gql`
 					isPreview
 					file
 				}
+				previewImageUrl
 			}
 		}
 	}
@@ -34,6 +35,7 @@ export const FIND_CONTENT_QUERY = gql`
 					file
 					isPreview
 				}
+				previewImageUrl
 				previewImage
 			}
 		}

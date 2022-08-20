@@ -18,6 +18,7 @@
 }
 
 .ql-container {
+	min-height: 300px;
 }
 
 @tailwind utilities;
