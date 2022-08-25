@@ -1,5 +1,4 @@
 import { useRouter } from 'next/router';
-import { imageLoader } from '../../utils/imageLoader';
 import {
 	FindAllChannel,
 	FindAllChannelVariables,
@@ -75,9 +74,9 @@ export default function ListUp() {
 									>
 										채널 카테고리
 									</span>
-									<div className="badge badge-secondary">
+									<span className="badge badge-secondary">
 										{categories?.tag.name}
-									</div>
+									</span>
 								</p>
 								<p>
 									<span
@@ -86,10 +85,10 @@ export default function ListUp() {
 									>
 										채널 운영진
 									</span>
-									{operators?.map((operator) => (
-										<div className="badge badge-outline">
+									{operators?.map((operator, index) => (
+										<span key={index} className="badge badge-outline">
 											{operator.user.nickname}
-										</div>
+										</span>
 									))}
 								</p>
 							</div>
@@ -100,6 +99,15 @@ export default function ListUp() {
 						</div>
 					</div>
 				),
+			)}
+			{results?.length > 20 && (
+				<button
+					className="btn btn-primary"
+					disabled={page !== 1}
+					onClick={() => setPage(2)}
+				>
+					더보기
+				</button>
 			)}
 		</>
 	);

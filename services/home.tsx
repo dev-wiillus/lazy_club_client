@@ -1,12 +1,18 @@
 import React, { useState } from 'react';
+import useRole from 'utils/hooks/useRole';
 import Logo from '../components/Logo';
 
 export default function Home() {
 	const [page, setPage] = useState(0);
+	const [role] = useRole();
 	return (
 		<div
 			className="hero h-full"
-			style={{ backgroundImage: 'url(https://placeimg.com/1000/800/arch)' }}
+			style={{
+				backgroundImage: `url(${
+					process.env.NEXT_PUBLIC_BACKEND_URL
+				}/images/${role?.toLocaleLowerCase()}.png)`,
+			}}
 		>
 			<div className="hero-overlay bg-opacity-60" />
 			<div className="hero-content text-white font-medium">

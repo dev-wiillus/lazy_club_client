@@ -44,6 +44,7 @@ export const FIND_CHANNEL_QUERY = gql`
 					user {
 						name
 						nickname
+						description
 					}
 				}
 				categories {
@@ -124,7 +125,7 @@ export const FIND_ALL_TAG_OPTIONS = gql`
 `;
 
 export const OPEN_ALERT_MUTATION = gql`
-	mutation OpenAlert(	$input: OpenAlertInput!) { 
+	mutation OpenAlert(	$input: RegisterOpenAlertInput!) { 
 		openAlert(input: $input	) {
 			ok
 			error

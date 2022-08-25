@@ -7,10 +7,10 @@ const User: NextPage = () => {
 	return (
 		<>
 			<Seo title="User Home" />
-			<div className="h-screen py-28">
+			<div className="snap-start h-screen py-28 pb-4">
 				<Home />
 			</div>
-			<div className="h-screen py-28">
+			<div className="snap-start h-screen pt-28 pb-4">
 				<Channels />
 			</div>
 		</>

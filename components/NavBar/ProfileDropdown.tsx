@@ -2,6 +2,7 @@ import { useMemo } from 'react';
 import useMe from '../../utils/hooks/useMe';
 import { UserRoleType } from '../../__generated__/globalTypes';
 import Avatar from './Avatar';
+import EditProfileButton from './MyPageButton';
 import RoleChanger from './RoleChanger';
 import SignInButton from './SignInButton';
 import SignOutButton from './SignOutButton';
@@ -13,9 +14,13 @@ export default function ProfileDropdown() {
 	const items = useMemo(() => {
 		if (data?.me.role) {
 			if (data?.me.role === UserRoleType.User) {
-				return [<SignOutButton className="w-full h-full" />];
+				return [
+					<EditProfileButton className="w-full h-full" />,
+					<SignOutButton className="w-full h-full" />,
+				];
 			}
 			return [
+				<EditProfileButton className="w-full h-full" />,
 				<RoleChanger className="w-full h-full" />,
 				<SignOutButton className="w-full h-full" />,
 			];

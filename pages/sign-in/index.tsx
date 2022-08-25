@@ -122,14 +122,11 @@ const SignIn: NextPage = () => {
 							</span>
 						</Link>
 					</div>
-					{/* <div className="card flex-shrink-0 w-full shadow-2xl bg-base-100">
+					<div className="card flex-shrink-0">
 						<div className="card-body">
-							<h4>카카오 계정으로 로그인</h4>
 							<a
 								id="custom-login-btn"
-								href="
-						// javascript:loginWithKakao()
-						"
+								href={`${process.env.NEXT_PUBLIC_BACKEND_URL}/auth/kakao`}
 							>
 								<img
 									src="//k.kakaocdn.net/14/dn/btroDszwNrM/I6efHub1SN5KCJqLm1Ovx1/o.jpg"
@@ -137,10 +134,10 @@ const SignIn: NextPage = () => {
 									alt="카카오 로그인 버튼"
 								/>
 							</a>
-							<h4>네이버 계정으로 로그인</h4>
-							<h4>Google 계정으로 로그인</h4>
+							{/* <h4>네이버 계정으로 로그인</h4>
+							<h4>Google 계정으로 로그인</h4> */}
 						</div>
-					</div> */}
+					</div>
 				</div>
 			</div>
 		</div>

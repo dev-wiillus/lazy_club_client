@@ -81,7 +81,6 @@ const Channels: NextPage = () => {
 	);
 
 	const onCreateContentClick = async () => {
-		console.log(channelId);
 		if (channelId) {
 			await createContent({
 				variables: {

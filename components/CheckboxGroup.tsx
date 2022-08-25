@@ -20,25 +20,25 @@ export default function CheckboxGroup({
 }: CheckboxGroupProps) {
 	const [value, setValue] = useState();
 	return (
-			<>
-				{items.map((item) => (
-					<div className="form-control" key={item.value}>
-						<label className="label cursor-pointer">
-							<span className="label-text font-normal">{item.label}</span>
-							<input
-								type="checkbox"
-								className="checkbox"
-								defaultChecked={item.defaultChecked}
-								value={item.value}
-								checked={item.value === value}
-								onClick={(event) => {
-									// console.log(event.target.value);
-									// setValue(event.target.value);
-								}}
-							/>
-						</label>
-					</div>
-				))}
-			</>
+		<>
+			{items.map((item) => (
+				<div className="form-control" key={item.value}>
+					<label className="label cursor-pointer">
+						<span className="label-text font-normal">{item.label}</span>
+						<input
+							type="checkbox"
+							className="checkbox"
+							defaultChecked={item.defaultChecked}
+							value={item.value}
+							checked={item.value === value}
+							onClick={(event) => {
+								// console.log(event.target.value);
+								// setValue(event.target.value);
+							}}
+						/>
+					</label>
+				</div>
+			))}
+		</>
 	);
 }

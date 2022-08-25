@@ -120,10 +120,8 @@ const UpdateContent: NextPage = () => {
 	const [status, setStatus] = useState<ContentStatusType>();
 
 	const onSubmit = async () => {
-		console.log();
 		if (userData?.me.email && results?.id) {
 			const { id, title, content, previewImage } = getValues();
-			console.log(getValues());
 			const htmlContent = new File([content], 'content.html', {
 				type: 'text/html',
 			});

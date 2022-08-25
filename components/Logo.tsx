@@ -15,7 +15,7 @@ export default function Logo({ color, ...props }: InputProps) {
 			alt="logo"
 			style={{ verticalAlign: 'bottom' }}
 			width={200}
-			height={50}
+			height={40}
 			{...props}
 		/>
 	);
