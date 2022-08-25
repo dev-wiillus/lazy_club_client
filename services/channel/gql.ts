@@ -111,6 +111,38 @@ export const CREATE_CHANNEL_MUTATION = gql`
 	}
 `;
 
+export const EDIT_CHANNEL_MUTATION = gql`
+	mutation EditChannel(
+		$channelInput: EditChannelInput!
+	) {
+		editChannel(
+			channelInput: $channelInput
+		) {
+			ok
+			error
+			result {
+				id
+				title
+				description
+				thumbnail
+			}
+		}
+	}
+`;
+
+export const DELETE_CHANNEL_MUTATION = gql`
+	mutation DeleteChannel(
+		$channelInput: DeleteChannelInput!
+	) {
+		deleteChannel(
+			channelInput: $channelInput
+		) {
+			ok
+			error
+		}
+	}
+`;
+
 export const FIND_ALL_TAG_OPTIONS = gql`
 	query FindAllTagOptions {
 		findAllTagOptions {

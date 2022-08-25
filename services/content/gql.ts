@@ -81,3 +81,11 @@ export const EDIT_CONTENT_MUTATION = gql`
 		}
 	}
 `;
+
+export const DELETE_CONTENT_MUTATION = gql`
+	mutation DeleteContent($input: DeleteContentInput!) {
+		deleteContent(input: $input) {
+			ok
+		}
+	}
+`;

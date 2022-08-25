@@ -1,8 +1,7 @@
-import { gql, useApolloClient, useMutation } from '@apollo/client';
+import { gql, useMutation } from '@apollo/client';
 import MessageModal from 'components/Modal';
 import { useRouter } from 'next/router';
-import { useCallback, useEffect, useState } from 'react';
-import useMe from '../../utils/hooks/useMe';
+import {  useEffect, useState } from 'react';
 import {
 	VerifyEmail,
 	VerifyEmailVariables,
@@ -18,30 +17,17 @@ const VERIFY_EMAIL_MUTATION = gql`
 `;
 
 const ConfirmEmail = () => {
-	const { data: userData } = useMe();
-	const client = useApolloClient();
 	const router = useRouter();
 
 	const [modalState, setModalState] = useState(false);
 	const additionalAction = () => {
-		router.push('/');
+		router.push('/sign-in');
 	};
 	const onCompleted = (data: VerifyEmail) => {
 		const {
 			verifyEmail: { ok },
 		} = data;
-		if (ok && userData?.me.id) {
-			client.writeFragment({
-				id: `UserOutput:${userData.me.id}`,
-				fragment: gql`
-					fragment VerifiedUser on UserOutput {
-						verified
-					}
-				`,
-				data: {
-					verified: true,
-				},
-			});
+		if (ok ) {
 			setModalState(true);
 		}
 	};

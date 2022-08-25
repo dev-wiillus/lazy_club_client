@@ -10,7 +10,7 @@ export default function Lounge() {
 		if (data?.me.hasChannel) {
 			return ['/creator/channels', '내 채널로 이동하기'];
 		} else {
-			return ['/creator/channels/mutate', '채널 만들기'];
+			return ['/creator/channels/create', '채널 만들기'];
 		}
 	}, []);
 	return (

@@ -1,4 +1,9 @@
-import { useLazyQuery, useMutation } from '@apollo/client';
+import {
+	gql,
+	useApolloClient,
+	useLazyQuery,
+	useMutation,
+} from '@apollo/client';
 import type { NextPage } from 'next';
 import Image, { noImagePath } from 'components/Image';
 import Link from 'next/link';
@@ -22,11 +27,13 @@ import MessageModal from 'components/Modal';
 import FindAllContent from 'services/content/find-all';
 import { AlertSVG } from 'components/icons';
 import { AddComma } from 'utils/number';
+import DeleteButton from '../../../services/channel/DeleteButton';
 
 const Channels: NextPage = () => {
 	const [role] = useRole();
 	const { data: userData } = useMe();
 	const router = useRouter();
+	const client = useApolloClient();
 	const [request, { data, loading }] = useLazyQuery<
 		FindChannel,
 		FindChannelVariables
@@ -52,7 +59,9 @@ const Channels: NextPage = () => {
 		hasDraftContent,
 		alertsCount,
 	} = data?.findChannel.results ?? {};
-	const contentUrl = `/${role?.toLowerCase()}/contents`;
+	const rootUrl = `/${role?.toLowerCase()}`;
+	const channelEditUrl = `${rootUrl}/channels/edit`;
+	const contentUrl = `${rootUrl}/contents`;
 	const updateUrl = `${contentUrl}/update`;
 
 	const onContentClick = (id: number) => {
@@ -64,7 +73,26 @@ const Channels: NextPage = () => {
 
 	const [createContentError, setCreateContentError] = useState(false);
 	const onCompleted = (data: CreateContent) => {
-		if (data.createContent.ok) {
+		const {
+			createContent: { ok, results },
+		} = data;
+		if (ok) {
+			client.writeFragment({
+				id: `ContentOutput:${results.id}`,
+				fragment: gql`
+					fragment MutateContent on ContentOutput {
+						title
+						content
+						status
+						contentFiles {
+							id
+							file
+							isPreview
+						}
+					}
+				`,
+				data: results,
+			});
 			router.push({
 				pathname: updateUrl,
 				query: { contentId: data.createContent.results?.id },
@@ -77,6 +105,7 @@ const Channels: NextPage = () => {
 		CREATE_CONTENT_MUTATION,
 		{
 			onCompleted,
+			refetchQueries: ['findChannel'],
 		},
 	);
 
@@ -114,6 +143,17 @@ const Channels: NextPage = () => {
 								</button>
 							</a>
 						</Link>
+						<Link
+							href={{
+								pathname: channelEditUrl,
+								query: { channelId },
+							}}
+						>
+							<a>
+								<button className="btn">채널 수정</button>
+							</a>
+						</Link>
+						<DeleteButton channelId={channelId} />
 					</div>
 				</div>
 				<div className="grid grid-cols-1 gap-8">
@@ -140,7 +180,10 @@ const Channels: NextPage = () => {
 					</div>
 					<div>
 						<h3 className="text-base mb-2 font-bold">인기 콘텐츠</h3>
-						<FindAllContent channelId={channelId} onContentClick={onContentClick} />
+						<FindAllContent
+							channelId={channelId}
+							onContentClick={onContentClick}
+						/>
 					</div>
 				</div>
 			</div>

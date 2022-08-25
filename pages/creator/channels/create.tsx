@@ -1,4 +1,5 @@
 import { gql, useApolloClient, useMutation, useQuery } from '@apollo/client';
+import { FormError } from 'components/FormError';
 import ImagePreviewInput from 'components/ImagePreviewInput';
 import { NextPage } from 'next';
 import { useRouter } from 'next/router';
@@ -24,10 +25,9 @@ type EmailFieldValues = {
 	value: string;
 };
 
-type IForm = Omit<CreateChannelInput, 'thumbnail' | 'userProfile' | 'tagId'> & {
+type IForm = Omit<CreateChannelInput, 'thumbnail' | 'tagId'> & {
 	emails: EmailFieldValues[];
 	userNickname: string;
-	userProfile?: File[];
 	thumbnail?: File[];
 	tagId?: number | string;
 };
@@ -76,7 +76,7 @@ const MutateChannel: NextPage = () => {
 			router.push(`/${role?.toLowerCase()}/channels`);
 		}
 	};
-	const [mutateChannel, { loading }] = useMutation<
+	const [mutateChannel, { data: mutationResult }] = useMutation<
 		CreateChannel,
 		CreateChannelVariables
 	>(CREATE_CHANNEL_MUTATION, {
@@ -99,7 +99,6 @@ const MutateChannel: NextPage = () => {
 			description,
 			tagId,
 			thumbnail,
-			userProfile,
 			emails,
 			agentIntroduction,
 			termsOfService,
@@ -116,7 +115,6 @@ const MutateChannel: NextPage = () => {
 						termsOfService,
 						agreements,
 						...(thumbnail && { thumbnail: thumbnail[0] }),
-						...(userProfile && { userProfile: userProfile[0] }),
 					},
 					channelOperatorInput: {
 						emails:
@@ -210,7 +208,7 @@ const MutateChannel: NextPage = () => {
 					<label className="label" htmlFor="userProfile">
 						<span className="label-text">대표 운영자 프로필</span>
 					</label>
-					<ImagePreviewInput {...register('userProfile')} />
+					<ImagePreviewInput imgSrc={userData?.me.profile} disabled />
 				</div>
 				<div className="form-control w-full space-y-2">
 					<label className="label" htmlFor="agentIntroduction">
@@ -282,6 +280,9 @@ const MutateChannel: NextPage = () => {
 				<button type="submit" className="btn btn-primary w-full">
 					채널 생성
 				</button>
+				{!mutationResult?.createChannel.ok && (
+					<FormError errorMessage={mutationResult.createChannel.error} />
+				)}
 			</form>
 		</div>
 	);

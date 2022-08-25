@@ -1,4 +1,9 @@
-import { useApolloClient, useLazyQuery, useMutation } from '@apollo/client';
+import {
+	gql,
+	useApolloClient,
+	useLazyQuery,
+	useMutation,
+} from '@apollo/client';
 import { NextPage } from 'next';
 import { useEffect, useState } from 'react';
 import { useForm } from 'react-hook-form';
@@ -23,6 +28,7 @@ import {
 } from '../../../services/content/gql';
 import MessageModal from 'components/Modal';
 import ImagePreviewInput from 'components/ImagePreviewInput';
+import DeleteButton from 'services/content/DeleteButton';
 
 const DynamicComponent = dynamic(
 	() => import('../../../components/QuillEditor'),
@@ -75,23 +81,23 @@ const UpdateContent: NextPage = () => {
 		if (data.editContent.ok) {
 			const { editContent } = data;
 			if (editContent.ok && editContent.results) {
-				// const { __typename, id, ...data } = editContent.results;
-				// client.writeFragment({
-				// 	id: `ContentOutput:${id}`,
-				// 	fragment: gql`
-				// 		fragment ContentFragment on ContentOutput {
-				// 			title
-				// 			content
-				// 			status
-				// 			contentFiles {
-				// 				id
-				// 				file
-				// 				isPreview
-				// 			}
-				// 		}
-				// 	`,
-				// 	data,
-				// });
+				const { __typename, id, ...data } = editContent.results;
+				client.writeFragment({
+					id: `ContentOutput:${id}`,
+					fragment: gql`
+						fragment ContentFragment on ContentOutput {
+							title
+							content
+							status
+							contentFiles {
+								id
+								file
+								isPreview
+							}
+						}
+					`,
+					data,
+				});
 				// TODO: move to content read page
 				push(`/creator/channels`);
 			}
@@ -162,6 +168,7 @@ const UpdateContent: NextPage = () => {
 							>
 								임시 저장
 							</button>
+							<DeleteButton contentId={+contentId} />
 						</div>
 						<div className="form-control w-full space-y-2">
 							<textarea
