@@ -281,7 +281,7 @@ const MutateChannel: NextPage = () => {
 					채널 생성
 				</button>
 				{!mutationResult?.createChannel.ok && (
-					<FormError errorMessage={mutationResult.createChannel.error} />
+					<FormError errorMessage={mutationResult?.createChannel.error} />
 				)}
 			</form>
 		</div>
