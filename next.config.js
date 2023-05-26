@@ -27,6 +27,14 @@ const nextConfig = {
 
 		return config;
 	},
+    async rewrites() {
+        return [
+          {
+            source: '/auth/kakao/callback',
+            destination: `${process.env.NEXT_PUBLIC_BACKEND_URL}/auth/kakao/callback`,
+          },
+        ]
+      },
 };
 
 module.exports = nextConfig;

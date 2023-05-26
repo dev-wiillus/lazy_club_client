@@ -127,6 +127,9 @@ const SignIn: NextPage = () => {
 							<a
 								id="custom-login-btn"
 								href={`${process.env.NEXT_PUBLIC_BACKEND_URL}/auth/kakao`}
+								// href={`https://kauth.kakao.com/oauth/authorize?client_id=${
+								// 	process.env.NEXT_PUBLIC_KAKAO_ID
+								// }&redirect_uri=${'http://localhost:3000/auth/kakao'}&response_type=code`}
 							>
 								<img
 									src="//k.kakaocdn.net/14/dn/btroDszwNrM/I6efHub1SN5KCJqLm1Ovx1/o.jpg"
